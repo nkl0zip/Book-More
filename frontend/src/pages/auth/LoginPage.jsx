@@ -4,11 +4,11 @@ import { useForm } from 'react-hook-form'
 import { useAuth } from '../../context/AuthContext'
 import { Spinner } from '../../components/ui/Spinner'
 
-// ── Inline SVG icons (no external icon lib needed) ──────────────────────────
+// ── Icons ────────────────────────────────────────────────────────────────────
 
-function IconCalendar() {
+function IconLogo() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="4" width="18" height="18" rx="3"/>
       <path d="M16 2v4M8 2v4M3 10h18"/>
     </svg>
@@ -48,19 +48,12 @@ function IconEye({ off }) {
   )
 }
 
-function IconCheck() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12"/>
-    </svg>
-  )
-}
-
-function IconClock() {
+function IconAlertCircle() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10"/>
-      <polyline points="12 6 12 12 16 14"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
     </svg>
   )
 }
@@ -73,23 +66,13 @@ function IconShield() {
   )
 }
 
-function IconAlertCircle() {
+function IconArrowRight() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="12" y1="8" x2="12" y2="12"/>
-      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14M12 5l7 7-7 7"/>
     </svg>
   )
 }
-
-// ── Feature highlights shown on the left panel ──────────────────────────────
-
-const FEATURES = [
-  { icon: <IconCalendar />, label: 'Book appointments in seconds' },
-  { icon: <IconClock />,    label: 'Real-time availability updates' },
-  { icon: <IconShield />,   label: 'Secure, private and encrypted' },
-]
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -122,41 +105,32 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="auth-root">
-      {/* ── Left panel ── */}
-      <div className="auth-illustration">
-        <div className="auth-illustration-blob auth-illustration-blob-1" />
-        <div className="auth-illustration-blob auth-illustration-blob-2" />
-
-        <div className="auth-brand animate-fade-in-up">
-          <div className="auth-brand-logo">
-            <IconCalendar />
-          </div>
-          <h1>BookMore</h1>
-          <p>Effortless appointment scheduling for patients and healthcare providers.</p>
-        </div>
-
-        <div className="auth-illustration-features stagger">
-          {FEATURES.map((f, i) => (
-            <div key={i} className="auth-feature-card animate-fade-in-up">
-              <div className="auth-feature-icon">{f.icon}</div>
-              <span>{f.label}</span>
-            </div>
-          ))}
-        </div>
+    <>
+      {/* ── Aurora background ── */}
+      <div className="aurora-bg" aria-hidden="true">
+        <div className="aurora-orb orb-1" />
+        <div className="aurora-orb orb-2" />
+        <div className="aurora-orb orb-3" />
+        <div className="aurora-orb orb-4" />
+        <div className="aurora-orb orb-5" />
       </div>
 
-      {/* ── Right panel — form ── */}
-      <div className="auth-panel">
-        <div className="auth-form-container animate-fade-in-up">
-          <div className="auth-form-header">
-            <h2>Welcome back</h2>
-            <p>Sign in to your BookMore account to continue.</p>
-          </div>
+      {/* ── Centered auth scene ── */}
+      <div className="auth-scene">
+        {/* Logo above card */}
+        <div className="auth-logo">
+          <div className="auth-logo-mark"><IconLogo /></div>
+          <span className="auth-logo-text">BookMore</span>
+        </div>
+
+        {/* Glass card */}
+        <div className="glass-card auth-card">
+          <h2 className="auth-card-title">Welcome back</h2>
+          <p className="auth-card-subtitle">Sign in to continue to BookMore</p>
 
           {/* Server error */}
           {serverError && (
-            <div className="alert alert-error animate-fade-in">
+            <div className="glass-alert glass-alert-error">
               <span className="alert-icon"><IconAlertCircle /></span>
               <span>{serverError}</span>
             </div>
@@ -164,20 +138,20 @@ export default function LoginPage() {
 
           {/* Redirect notice */}
           {location.state?.from && !submitted && (
-            <div className="alert alert-info animate-fade-in">
+            <div className="glass-alert glass-alert-info">
               <span className="alert-icon"><IconShield /></span>
               <span>Please sign in to access that page.</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="stagger-form">
             {/* Email */}
             <div className="form-group">
               <label className="form-label" htmlFor="email">
                 Email address <span className="required">*</span>
               </label>
               <div className="form-input-wrapper">
-                <span className="form-input-icon" style={{ left: 14 }}><IconMail /></span>
+                <span className="form-input-icon"><IconMail /></span>
                 <input
                   id="email"
                   type="email"
@@ -194,22 +168,20 @@ export default function LoginPage() {
                 />
               </div>
               {errors.email && (
-                <p className="form-error">
-                  <IconAlertCircle /> {errors.email.message}
-                </p>
+                <p className="form-error"><IconAlertCircle /> {errors.email.message}</p>
               )}
             </div>
 
             {/* Password */}
             <div className="form-group">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+              <div className="form-label-row">
                 <label className="form-label" htmlFor="password" style={{ margin: 0 }}>
                   Password <span className="required">*</span>
                 </label>
-                <a href="#" style={{ fontSize: '0.8125rem', fontWeight: 450 }}>Forgot password?</a>
+                <a href="#" className="form-forgot-link">Forgot password?</a>
               </div>
               <div className="form-input-wrapper">
-                <span className="form-input-icon" style={{ left: 14 }}><IconLock /></span>
+                <span className="form-input-icon"><IconLock /></span>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -229,39 +201,37 @@ export default function LoginPage() {
                 </button>
               </div>
               {errors.password && (
-                <p className="form-error">
-                  <IconAlertCircle /> {errors.password.message}
-                </p>
+                <p className="form-error"><IconAlertCircle /> {errors.password.message}</p>
               )}
             </div>
 
-            <div style={{ marginTop: 'var(--space-6)' }}>
+            <div className="form-group" style={{ marginTop: 'var(--sp-6)', marginBottom: 0 }}>
               <button
                 type="submit"
-                className="btn btn-primary btn-full btn-lg"
+                className="btn glass-btn-primary btn-full btn-lg"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
                   <>
-                    <Spinner size={18} color="rgba(255,255,255,0.8)" />
+                    <Spinner size={18} color="rgba(255,255,255,0.85)" />
                     Signing in…
                   </>
                 ) : (
                   <>
-                    <IconCheck />
                     Sign in
+                    <IconArrowRight />
                   </>
                 )}
               </button>
             </div>
           </form>
 
-          <p className="auth-footer">
+          <p className="auth-switch-text">
             Don&apos;t have an account?{' '}
             <Link to="/register">Create one free</Link>
           </p>
         </div>
       </div>
-    </div>
+    </>
   )
 }

@@ -32,18 +32,12 @@ export default function Navbar() {
   const getInitials = (name = '') =>
     name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
 
-  const patientLinks = [
-    { to: '/patient/dashboard', label: 'Dashboard' },
-  ]
-
-  const providerLinks = [
-    { to: '/provider/dashboard', label: 'Dashboard' },
-  ]
-
+  const patientLinks = [{ to: '/patient/dashboard', label: 'Dashboard' }]
+  const providerLinks = [{ to: '/provider/dashboard', label: 'Dashboard' }]
   const navLinks = user?.role === 'provider' ? providerLinks : patientLinks
 
   return (
-    <nav className="navbar">
+    <nav className="glass-navbar">
       <div className="navbar-inner">
         {/* Logo */}
         <Link to="/" className="navbar-logo">
@@ -51,7 +45,7 @@ export default function Navbar() {
           <span className="navbar-logo-text">BookMore</span>
         </Link>
 
-        {/* Nav links (only when authenticated) */}
+        {/* Nav links */}
         {isAuthenticated && (
           <div className="navbar-nav">
             {navLinks.map(({ to, label }) => (
@@ -73,21 +67,21 @@ export default function Navbar() {
               <div className="navbar-avatar">{getInitials(user?.name)}</div>
               <span className="navbar-user-name">{user?.name?.split(' ')[0]}</span>
               <button
-                className="btn btn-ghost"
+                className="btn glass-btn-ghost"
                 onClick={handleLogout}
-                style={{ gap: 'var(--space-2)', height: 34, padding: '0 var(--space-3)' }}
+                style={{ gap: 'var(--sp-2)', height: 34, padding: '0 var(--sp-3)', fontSize: '0.875rem', color: 'rgba(255,255,255,0.55)' }}
                 title="Sign out"
               >
                 <IconLogOut />
-                <span style={{ fontSize: '0.875rem' }}>Sign out</span>
+                <span>Sign out</span>
               </button>
             </div>
           ) : (
             <>
-              <Link to="/login" className="btn btn-secondary" style={{ height: 36, fontSize: '0.875rem' }}>
+              <Link to="/login" className="btn glass-btn-secondary" style={{ height: 36, fontSize: '0.875rem' }}>
                 Sign in
               </Link>
-              <Link to="/register" className="btn btn-primary" style={{ height: 36, fontSize: '0.875rem' }}>
+              <Link to="/register" className="btn glass-btn-primary" style={{ height: 36, fontSize: '0.875rem' }}>
                 Get started
               </Link>
             </>

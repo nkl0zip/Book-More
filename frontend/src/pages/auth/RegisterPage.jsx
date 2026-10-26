@@ -4,11 +4,11 @@ import { useForm } from 'react-hook-form'
 import { useAuth } from '../../context/AuthContext'
 import { Spinner } from '../../components/ui/Spinner'
 
-// ── Inline SVG icons ─────────────────────────────────────────────────────────
+// ── Icons ────────────────────────────────────────────────────────────────────
 
-function IconCalendar() {
+function IconLogo() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="4" width="18" height="18" rx="3"/>
       <path d="M16 2v4M8 2v4M3 10h18"/>
     </svg>
@@ -47,26 +47,6 @@ function IconBriefcase() {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="7" width="20" height="14" rx="2"/>
       <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-      <line x1="12" y1="12" x2="12" y2="12"/>
-    </svg>
-  )
-}
-
-function IconStethoscope() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
-      <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
-      <circle cx="20" cy="10" r="2"/>
-    </svg>
-  )
-}
-
-function IconHeartPulse() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-      <path d="M3.22 12H9.5l1.5-5 3 9 1.5-4.5H22"/>
     </svg>
   )
 }
@@ -98,19 +78,30 @@ function IconAlertCircle() {
 
 function IconArrowRight() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M5 12h14M12 5l7 7-7 7"/>
     </svg>
   )
 }
 
-// ── Left panel stats (decorative) ────────────────────────────────────────────
+function IconHeartPulse() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+      <path d="M3.22 12H9.5l1.5-5 3 9 1.5-4.5H22"/>
+    </svg>
+  )
+}
 
-const STATS = [
-  { value: '2,400+', label: 'Active providers' },
-  { value: '18k',    label: 'Bookings this month' },
-  { value: '4.9★',   label: 'Average rating' },
-]
+function IconStethoscope() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
+      <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
+      <circle cx="20" cy="10" r="2"/>
+    </svg>
+  )
+}
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -120,7 +111,7 @@ export default function RegisterPage() {
 
   const [serverError, setServerError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [selectedRole, setSelectedRole] = useState('patient')
+  const [selectedRole, setSelectedRole] = useState('patient') // eslint-disable-line no-unused-vars
 
   const {
     register,
@@ -146,78 +137,39 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="auth-root">
-      {/* ── Left illustration panel ── */}
-      <div className="auth-illustration">
-        <div className="auth-illustration-blob auth-illustration-blob-1" />
-        <div className="auth-illustration-blob auth-illustration-blob-2" />
-
-        <div className="auth-brand animate-fade-in-up">
-          <div className="auth-brand-logo">
-            <IconCalendar />
-          </div>
-          <h1>BookMore</h1>
-          <p>Join thousands of patients and healthcare providers who trust BookMore for seamless scheduling.</p>
-        </div>
-
-        <div style={{ position: 'relative', zIndex: 1, marginTop: 'var(--space-12)', width: '100%', maxWidth: 360 }}>
-          <div
-            className="card-glass animate-fade-in-up"
-            style={{ padding: 'var(--space-6)' }}
-          >
-            <p style={{
-              fontSize: '0.8125rem',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: 'var(--color-text-tertiary)',
-              marginBottom: 'var(--space-5)'
-            }}>
-              By the numbers
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
-              {STATS.map((s, i) => (
-                <div key={i} style={{ textAlign: 'center' }}>
-                  <div style={{
-                    fontSize: '1.5rem',
-                    fontWeight: 700,
-                    color: 'var(--color-accent)',
-                    letterSpacing: '-0.03em',
-                    lineHeight: 1.2,
-                  }}>{s.value}</div>
-                  <div style={{
-                    fontSize: '0.75rem',
-                    color: 'var(--color-text-secondary)',
-                    marginTop: 2
-                  }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+    <>
+      {/* ── Aurora background ── */}
+      <div className="aurora-bg" aria-hidden="true">
+        <div className="aurora-orb orb-1" />
+        <div className="aurora-orb orb-2" />
+        <div className="aurora-orb orb-3" />
+        <div className="aurora-orb orb-4" />
+        <div className="aurora-orb orb-5" />
       </div>
 
-      {/* ── Right form panel ── */}
-      <div className="auth-panel">
-        <div className="auth-form-container animate-fade-in-up" style={{ maxWidth: 460 }}>
-          <div className="auth-form-header">
-            <h2>Create your account</h2>
-            <p>Get started with BookMore — it only takes a minute.</p>
-          </div>
+      {/* ── Auth scene ── */}
+      <div className="auth-scene">
+        <div className="auth-logo">
+          <div className="auth-logo-mark"><IconLogo /></div>
+          <span className="auth-logo-text">BookMore</span>
+        </div>
+
+        <div className="glass-card auth-card auth-card-wide">
+          <h2 className="auth-card-title">Create your account</h2>
+          <p className="auth-card-subtitle">Get started — it only takes a minute.</p>
 
           {serverError && (
-            <div className="alert alert-error animate-fade-in">
+            <div className="glass-alert glass-alert-error">
               <span className="alert-icon"><IconAlertCircle /></span>
               <span>{serverError}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="stagger-form">
             {/* Role selector */}
             <div className="form-group">
               <span className="form-label">I am a <span className="required">*</span></span>
               <div className="role-selector">
-                {/* Patient */}
                 <label className="role-option">
                   <input
                     type="radio"
@@ -226,15 +178,12 @@ export default function RegisterPage() {
                     onChange={(e) => setSelectedRole(e.target.value)}
                   />
                   <div className="role-card">
-                    <div className="role-card-icon">
-                      <IconHeartPulse />
-                    </div>
+                    <div className="role-card-icon"><IconHeartPulse /></div>
                     <span className="role-card-label">Patient</span>
                     <span className="role-card-sublabel">Book appointments</span>
                   </div>
                 </label>
 
-                {/* Provider */}
                 <label className="role-option">
                   <input
                     type="radio"
@@ -243,9 +192,7 @@ export default function RegisterPage() {
                     onChange={(e) => setSelectedRole(e.target.value)}
                   />
                   <div className="role-card">
-                    <div className="role-card-icon">
-                      <IconStethoscope />
-                    </div>
+                    <div className="role-card-icon"><IconStethoscope /></div>
                     <span className="role-card-label">Provider</span>
                     <span className="role-card-sublabel">Manage patients</span>
                   </div>
@@ -361,15 +308,15 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div style={{ marginTop: 'var(--space-6)' }}>
+            <div className="form-group" style={{ marginTop: 'var(--sp-6)', marginBottom: 0 }}>
               <button
                 type="submit"
-                className="btn btn-primary btn-full btn-lg"
+                className="btn glass-btn-primary btn-full btn-lg"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
                   <>
-                    <Spinner size={18} color="rgba(255,255,255,0.8)" />
+                    <Spinner size={18} color="rgba(255,255,255,0.85)" />
                     Creating account…
                   </>
                 ) : (
@@ -381,20 +328,19 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-tertiary)', textAlign: 'center', marginTop: 'var(--space-4)' }}>
+            <p className="terms-text">
               By creating an account you agree to our{' '}
-              <a href="#" style={{ color: 'var(--color-text-secondary)' }}>Terms of Service</a>{' '}
-              and{' '}
-              <a href="#" style={{ color: 'var(--color-text-secondary)' }}>Privacy Policy</a>.
+              <a href="#">Terms of Service</a>{' '}and{' '}
+              <a href="#">Privacy Policy</a>.
             </p>
           </form>
 
-          <p className="auth-footer">
+          <p className="auth-switch-text">
             Already have an account?{' '}
             <Link to="/login">Sign in</Link>
           </p>
         </div>
       </div>
-    </div>
+    </>
   )
 }
