@@ -1,11 +1,64 @@
-import React from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import Layout from './components/layout/Layout'
+import ProtectedRoute from './components/ui/ProtectedRoute'
+import LoginPage from './pages/auth/LoginPage'
+import RegisterPage from './pages/auth/RegisterPage'
+import PatientDashboard from './pages/patient/PatientDashboard'
+import ProviderDashboard from './pages/provider/ProviderDashboard'
+import { useAuth } from './context/AuthContext'
 
-function App() {
+function HomePage() {
+  const { isAuthenticated, user } = useAuth()
+  if (isAuthenticated) {
+    return <Navigate to={user?.role === 'provider' ? '/provider/dashboard' : '/patient/dashboard'} replace />
+  }
+  return <Navigate to="/login" replace />
+}
+
+function NotFound() {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'sans-serif' }}>
-      <h1>Book More — Hello World</h1>
-    </div>
+    <main style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      minHeight: '60vh', textAlign: 'center', padding: 'var(--space-8)'
+    }}>
+      <h1 style={{ fontSize: '5rem', fontWeight: 800, color: 'var(--color-accent)', lineHeight: 1 }}>404</h1>
+      <h2 style={{ margin: 'var(--space-4) 0 var(--space-3)' }}>Page not found</h2>
+      <p>The page you are looking for doesn&apos;t exist or has been moved.</p>
+    </main>
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <Routes>
+      {/* Auth routes — no navbar */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      {/* App routes — with navbar */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<HomePage />} />
+
+        <Route
+          path="/patient/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <PatientDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/provider/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['provider']}>
+              <ProviderDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
+  )
+}
