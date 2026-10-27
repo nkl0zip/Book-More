@@ -51,6 +51,26 @@ const schemas = {
     bio: Joi.string().max(500).optional().allow(''),
     specialisation: Joi.string().trim().optional().allow(''),
   }),
+
+  updateProviderProfile: Joi.object({
+    name: Joi.string().trim().min(2).max(100).optional().messages({
+      'string.min': 'Name must be at least 2 characters',
+    }),
+    specialisation: Joi.string().trim().min(2).max(100).optional().messages({
+      'string.min': 'Specialisation must be at least 2 characters',
+    }),
+    bio: Joi.string().max(500).optional().allow('').messages({
+      'string.max': 'Bio cannot exceed 500 characters',
+    }),
+    phone: Joi.string()
+      .pattern(/^[+\d\s\-().]{7,20}$/)
+      .optional()
+      .allow('')
+      .messages({ 'string.pattern.base': 'Please enter a valid phone number' }),
+    avatarUrl: Joi.string().uri().optional().allow('').messages({
+      'string.uri': 'Avatar URL must be a valid URL',
+    }),
+  }),
 }
 
 module.exports = { validate, schemas }

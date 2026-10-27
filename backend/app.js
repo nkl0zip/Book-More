@@ -4,7 +4,8 @@ const cors = require('cors')
 const morgan = require('morgan')
 const connectDB = require('./config/db')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware')
-const authRoutes = require('./routes/authRoutes')
+const authRoutes     = require('./routes/authRoutes')
+const providerRoutes = require('./routes/providerRoutes')
 
 const app = express()
 
@@ -26,7 +27,8 @@ app.get('/api/health', (_req, res) => {
 })
 
 // Routes
-app.use('/api/auth', authRoutes)
+app.use('/api/auth',      authRoutes)
+app.use('/api/providers', providerRoutes)
 
 // Error handling
 app.use(notFound)
