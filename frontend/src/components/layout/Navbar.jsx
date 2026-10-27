@@ -32,8 +32,14 @@ export default function Navbar() {
   const getInitials = (name = '') =>
     name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
 
-  const patientLinks = [{ to: '/patient/dashboard', label: 'Dashboard' }]
-  const providerLinks = [{ to: '/provider/dashboard', label: 'Dashboard' }]
+  const patientLinks = [
+    { to: '/patient/dashboard', label: 'Dashboard' },
+    { to: '/providers',         label: 'Find Providers' },
+  ]
+  const providerLinks = [
+    { to: '/provider/dashboard', label: 'Dashboard' },
+    { to: '/provider/profile',   label: 'My Profile' },
+  ]
   const navLinks = user?.role === 'provider' ? providerLinks : patientLinks
 
   return (

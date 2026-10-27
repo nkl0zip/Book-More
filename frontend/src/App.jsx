@@ -4,7 +4,9 @@ import ProtectedRoute from './components/ui/ProtectedRoute'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import PatientDashboard from './pages/patient/PatientDashboard'
+import FindProvidersPage from './pages/patient/FindProvidersPage'
 import ProviderDashboard from './pages/provider/ProviderDashboard'
+import ProviderProfilePage from './pages/provider/ProviderProfilePage'
 import { useAuth } from './context/AuthContext'
 
 function HomePage() {
@@ -49,10 +51,28 @@ export default function App() {
         />
 
         <Route
+          path="/providers"
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <FindProvidersPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/provider/dashboard"
           element={
             <ProtectedRoute allowedRoles={['provider']}>
               <ProviderDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/provider/profile"
+          element={
+            <ProtectedRoute allowedRoles={['provider']}>
+              <ProviderProfilePage />
             </ProtectedRoute>
           }
         />
