@@ -7,6 +7,7 @@ import PatientDashboard from './pages/patient/PatientDashboard'
 import FindProvidersPage from './pages/patient/FindProvidersPage'
 import ProviderDashboard from './pages/provider/ProviderDashboard'
 import ProviderProfilePage from './pages/provider/ProviderProfilePage'
+import ProviderServicesPage from './pages/provider/ProviderServicesPage'
 import { useAuth } from './context/AuthContext'
 
 function HomePage() {
@@ -73,6 +74,15 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['provider']}>
               <ProviderProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/provider/services"
+          element={
+            <ProtectedRoute allowedRoles={['provider']}>
+              <ProviderServicesPage />
             </ProtectedRoute>
           }
         />
