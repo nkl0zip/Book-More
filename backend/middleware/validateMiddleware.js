@@ -71,6 +71,48 @@ const schemas = {
       'string.uri': 'Avatar URL must be a valid URL',
     }),
   }),
+
+  createService: Joi.object({
+    name: Joi.string().trim().min(2).max(100).required().messages({
+      'string.min': 'Service name must be at least 2 characters',
+      'any.required': 'Service name is required',
+    }),
+    description: Joi.string().trim().max(500).optional().allow('').messages({
+      'string.max': 'Description cannot exceed 500 characters',
+    }),
+    durationMinutes: Joi.number().integer().min(5).max(480).required().messages({
+      'number.min': 'Duration must be at least 5 minutes',
+      'number.max': 'Duration cannot exceed 480 minutes',
+      'any.required': 'Duration is required',
+    }),
+    price: Joi.number().min(0).required().messages({
+      'number.min': 'Price cannot be negative',
+      'any.required': 'Price is required',
+    }),
+    currency: Joi.string().trim().uppercase().length(3).optional().default('INR').messages({
+      'string.length': 'Currency must be a 3-letter code (e.g. INR, USD)',
+    }),
+  }),
+
+  updateService: Joi.object({
+    name: Joi.string().trim().min(2).max(100).optional().messages({
+      'string.min': 'Service name must be at least 2 characters',
+    }),
+    description: Joi.string().trim().max(500).optional().allow('').messages({
+      'string.max': 'Description cannot exceed 500 characters',
+    }),
+    durationMinutes: Joi.number().integer().min(5).max(480).optional().messages({
+      'number.min': 'Duration must be at least 5 minutes',
+      'number.max': 'Duration cannot exceed 480 minutes',
+    }),
+    price: Joi.number().min(0).optional().messages({
+      'number.min': 'Price cannot be negative',
+    }),
+    currency: Joi.string().trim().uppercase().length(3).optional().messages({
+      'string.length': 'Currency must be a 3-letter code (e.g. INR, USD)',
+    }),
+    isActive: Joi.boolean().optional(),
+  }),
 }
 
 module.exports = { validate, schemas }
