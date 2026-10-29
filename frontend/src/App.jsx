@@ -8,6 +8,7 @@ import FindProvidersPage from './pages/patient/FindProvidersPage'
 import ProviderDashboard from './pages/provider/ProviderDashboard'
 import ProviderProfilePage from './pages/provider/ProviderProfilePage'
 import ProviderServicesPage from './pages/provider/ProviderServicesPage'
+import ProviderSlotsPage from './pages/provider/ProviderSlotsPage'
 import { useAuth } from './context/AuthContext'
 
 function HomePage() {
@@ -83,6 +84,15 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['provider']}>
               <ProviderServicesPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/provider/slots"
+          element={
+            <ProtectedRoute allowedRoles={['provider']}>
+              <ProviderSlotsPage />
             </ProtectedRoute>
           }
         />

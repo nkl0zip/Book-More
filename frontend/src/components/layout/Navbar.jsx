@@ -39,6 +39,7 @@ export default function Navbar() {
   const providerLinks = [
     { to: '/provider/dashboard', label: 'Dashboard' },
     { to: '/provider/services',  label: 'My Services' },
+    { to: '/provider/slots',     label: 'My Slots' },
     { to: '/provider/profile',   label: 'My Profile' },
   ]
   const navLinks = user?.role === 'provider' ? providerLinks : patientLinks

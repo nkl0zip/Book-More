@@ -1738,3 +1738,316 @@ a:hover { color: var(--text-link-hover); }
   .service-grid { grid-template-columns: 1fr; }
   .modal-card { padding: var(--sp-6); }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AVAILABILITY SLOT MANAGEMENT
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Week Calendar Grid */
+.week-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--sp-2);
+  animation: slideInUp 0.45s var(--ease) 120ms both;
+}
+
+.week-day {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-3);
+  min-height: 160px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.week-day:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(139,92,246,0.3);
+}
+
+.week-day.today {
+  border-color: rgba(139,92,246,0.5);
+  background: rgba(139,92,246,0.07);
+}
+
+.week-day.past {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
+.week-day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-1);
+}
+
+.week-day-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.week-day-num {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-full);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.week-day-num.today {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+}
+
+.week-day-slots {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  flex: 1;
+}
+
+.week-add-hint {
+  margin-top: var(--sp-2);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  opacity: 0;
+  transition: opacity 0.2s;
+  text-align: center;
+}
+
+.week-day:hover .week-add-hint {
+  opacity: 1;
+}
+
+/* Slot chips inside calendar */
+.slot-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(167,139,250,0.15));
+  border: 1px solid rgba(139,92,246,0.35);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.slot-chip:hover {
+  background: linear-gradient(135deg, rgba(139,92,246,0.4), rgba(167,139,250,0.25));
+  border-color: rgba(139,92,246,0.6);
+  transform: translateY(-1px);
+}
+
+.slot-chip.booked {
+  background: linear-gradient(135deg, rgba(180,130,20,0.25), rgba(251,191,36,0.10));
+  border-color: rgba(251,191,36,0.35);
+}
+
+.slot-chip.booked:hover {
+  background: linear-gradient(135deg, rgba(180,130,20,0.38), rgba(251,191,36,0.18));
+  border-color: rgba(251,191,36,0.55);
+}
+
+.slot-chip-time {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: rgba(167,139,250,0.9);
+  letter-spacing: 0.02em;
+}
+
+.slot-chip.booked .slot-chip-time {
+  color: rgba(253,211,77,0.9);
+}
+
+.slot-chip-label {
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.slot-chip-booked {
+  font-size: 0.6rem;
+  color: rgba(253,211,77,0.75);
+  font-weight: 600;
+}
+
+/* Slot List View */
+.slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  animation: slideInUp 0.4s var(--ease) 80ms both;
+}
+
+.slot-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  transition: border-color 0.2s, background 0.2s;
+  animation: slideInUp 0.4s var(--ease) both;
+}
+
+.slot-list-item:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(139,92,246,0.25);
+}
+
+.slot-list-item.booked {
+  border-left: 3px solid rgba(251,191,36,0.5);
+}
+
+.slot-list-item.selected {
+  border-color: rgba(139,92,246,0.5);
+  background: rgba(139,92,246,0.06);
+}
+
+/* Slot select checkbox */
+.slot-select-box {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.slot-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--r-sm);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.slot-checkbox.checked {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: var(--accent);
+}
+
+.slot-checkbox.checked::after {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 9px;
+  border: 2px solid white;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+.slot-checkbox.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.slot-list-time {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 170px;
+}
+
+.slot-list-date {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.slot-list-range {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.slot-list-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.slot-service-tag {
+  font-size: 0.8125rem;
+  color: rgba(167,139,250,0.85);
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.22);
+  border-radius: var(--r-sm);
+  padding: 2px var(--sp-2);
+}
+
+.slot-list-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Availability badges */
+.badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-sm);
+}
+
+.badge-active {
+  background: rgba(16,185,129,0.15);
+  color: rgba(52,211,153,0.9);
+  border: 1px solid rgba(16,185,129,0.25);
+}
+
+.badge-booked {
+  background: rgba(180,130,20,0.18);
+  color: rgba(253,211,77,0.9);
+  border: 1px solid rgba(251,191,36,0.25);
+}
+
+/* Responsive — week calendar collapses to 3-col or 1-col */
+@media (max-width: 900px) {
+  .week-calendar {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--sp-2);
+  }
+}
+
+@media (max-width: 640px) {
+  .week-calendar {
+    grid-template-columns: 1fr 1fr;
+  }
+  .slot-list-time { min-width: 120px; }
+  .slot-list-item { flex-wrap: wrap; gap: var(--sp-3); }
+  .slot-list-actions { margin-left: 0; }
+}
+
+@media (max-width: 420px) {
+  .week-calendar { grid-template-columns: 1fr; }
+}
