@@ -113,6 +113,40 @@ const schemas = {
     }),
     isActive: Joi.boolean().optional(),
   }),
+
+  createSlot: Joi.object({
+    startTime: Joi.date().iso().greater('now').required().messages({
+      'date.base':    'Start time must be a valid date',
+      'date.greater': 'Start time must be in the future',
+      'any.required': 'Start time is required',
+    }),
+    endTime: Joi.date().iso().greater(Joi.ref('startTime')).required().messages({
+      'date.base':    'End time must be a valid date',
+      'date.greater': 'End time must be after start time',
+      'any.required': 'End time is required',
+    }),
+    service: Joi.string().hex().length(24).optional().allow(null, '').messages({
+      'string.length': 'service must be a valid MongoDB ObjectId',
+    }),
+    notes: Joi.string().trim().max(300).optional().allow('').messages({
+      'string.max': 'Notes cannot exceed 300 characters',
+    }),
+  }),
+
+  updateSlot: Joi.object({
+    startTime: Joi.date().iso().optional().messages({
+      'date.base': 'Start time must be a valid date',
+    }),
+    endTime: Joi.date().iso().optional().messages({
+      'date.base': 'End time must be a valid date',
+    }),
+    service: Joi.string().hex().length(24).optional().allow(null, '').messages({
+      'string.length': 'service must be a valid MongoDB ObjectId',
+    }),
+    notes: Joi.string().trim().max(300).optional().allow('').messages({
+      'string.max': 'Notes cannot exceed 300 characters',
+    }),
+  }),
 }
 
 module.exports = { validate, schemas }
