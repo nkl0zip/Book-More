@@ -9,6 +9,9 @@ import ProviderDashboard from './pages/provider/ProviderDashboard'
 import ProviderProfilePage from './pages/provider/ProviderProfilePage'
 import ProviderServicesPage from './pages/provider/ProviderServicesPage'
 import ProviderSlotsPage from './pages/provider/ProviderSlotsPage'
+import ProviderAppointmentsPage from './pages/provider/ProviderAppointmentsPage'
+import PatientBookingPage from './pages/patient/PatientBookingPage'
+import PatientAppointmentsPage from './pages/patient/PatientAppointmentsPage'
 import { useAuth } from './context/AuthContext'
 
 function HomePage() {
@@ -93,6 +96,33 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['provider']}>
               <ProviderSlotsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/provider/appointments"
+          element={
+            <ProtectedRoute allowedRoles={['provider']}>
+              <ProviderAppointmentsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/patient/book"
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <PatientBookingPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/patient/appointments"
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <PatientAppointmentsPage />
             </ProtectedRoute>
           }
         />

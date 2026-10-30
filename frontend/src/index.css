@@ -2051,3 +2051,231 @@ a:hover { color: var(--text-link-hover); }
 @media (max-width: 420px) {
   .week-calendar { grid-template-columns: 1fr; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   APPOINTMENT BOOKING
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Booking step bar ──────────────────────────────────────────── */
+.booking-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: var(--sp-6);
+  animation: slideInUp 0.4s var(--ease) 40ms both;
+}
+
+.booking-step {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  position: relative;
+  flex: 1;
+}
+
+.booking-step:last-child { flex: none; }
+
+.booking-step-num {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-full);
+  background: var(--glass-bg);
+  border: 1.5px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+
+.booking-step.active .booking-step-num {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: var(--accent);
+  color: white;
+}
+
+.booking-step.done .booking-step-num {
+  background: rgba(16,185,129,0.2);
+  border-color: rgba(16,185,129,0.4);
+  color: rgba(52,211,153,0.9);
+}
+
+.booking-step-label {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.booking-step.active .booking-step-label,
+.booking-step.done .booking-step-label {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.booking-step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--glass-border);
+  margin: 0 var(--sp-2);
+  min-width: var(--sp-6);
+}
+
+/* ── Slot picker groups ────────────────────────────────────────── */
+.slot-picker-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.slot-picker-group {}
+
+.slot-picker-date {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: var(--sp-2);
+}
+
+.slot-picker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.slot-picker-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-3);
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.28);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  min-width: 64px;
+}
+
+.slot-picker-chip:hover {
+  background: rgba(139,92,246,0.25);
+  border-color: rgba(139,92,246,0.5);
+  transform: translateY(-1px);
+}
+
+.slot-picker-chip.selected {
+  background: linear-gradient(135deg, rgba(139,92,246,0.45), rgba(167,139,250,0.3));
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(139,92,246,0.25);
+}
+
+.slot-picker-time {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: rgba(167,139,250,0.9);
+  font-variant-numeric: tabular-nums;
+}
+
+.slot-picker-svc {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+/* ── Appointment cards ─────────────────────────────────────────── */
+.appt-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  animation: slideInUp 0.4s var(--ease) 100ms both;
+}
+
+.appt-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  transition: border-color 0.2s, background 0.2s;
+  animation: slideInUp 0.4s var(--ease) both;
+}
+
+.appt-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(139,92,246,0.22);
+}
+
+.appt-card.dim {
+  opacity: 0.7;
+}
+
+.appt-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.appt-provider-info {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.appt-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.appt-provider-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+}
+
+.appt-provider-spec {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.appt-datetime {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.appt-actions {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .booking-step-label { display: none; }
+  .booking-steps { gap: 0; }
+  .appt-card-header { flex-wrap: wrap; }
+  .appt-actions { flex-wrap: wrap; }
+}

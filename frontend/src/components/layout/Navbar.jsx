@@ -33,14 +33,17 @@ export default function Navbar() {
     name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
 
   const patientLinks = [
-    { to: '/patient/dashboard', label: 'Dashboard' },
-    { to: '/providers',         label: 'Find Providers' },
+    { to: '/patient/dashboard',    label: 'Dashboard'    },
+    { to: '/patient/book',         label: 'Book'         },
+    { to: '/patient/appointments', label: 'Appointments' },
+    { to: '/providers',            label: 'Providers'    },
   ]
   const providerLinks = [
-    { to: '/provider/dashboard', label: 'Dashboard' },
-    { to: '/provider/services',  label: 'My Services' },
-    { to: '/provider/slots',     label: 'My Slots' },
-    { to: '/provider/profile',   label: 'My Profile' },
+    { to: '/provider/dashboard',    label: 'Dashboard'    },
+    { to: '/provider/appointments', label: 'Appointments' },
+    { to: '/provider/services',     label: 'My Services'  },
+    { to: '/provider/slots',        label: 'My Slots'     },
+    { to: '/provider/profile',      label: 'My Profile'   },
   ]
   const navLinks = user?.role === 'provider' ? providerLinks : patientLinks
 
