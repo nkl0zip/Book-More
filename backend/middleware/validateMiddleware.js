@@ -147,6 +147,35 @@ const schemas = {
       'string.max': 'Notes cannot exceed 300 characters',
     }),
   }),
+
+  bookAppointment: Joi.object({
+    slotId: Joi.string().hex().length(24).required().messages({
+      'string.length': 'slotId must be a valid MongoDB ObjectId',
+      'any.required': 'slotId is required',
+    }),
+    serviceId: Joi.string().hex().length(24).optional().allow(null, '').messages({
+      'string.length': 'serviceId must be a valid MongoDB ObjectId',
+    }),
+    notes: Joi.string().trim().max(500).optional().allow('').messages({
+      'string.max': 'Notes cannot exceed 500 characters',
+    }),
+  }),
+
+  cancelAppointment: Joi.object({
+    reason: Joi.string().trim().max(300).optional().allow('').messages({
+      'string.max': 'Cancellation reason cannot exceed 300 characters',
+    }),
+  }),
+
+  rescheduleAppointment: Joi.object({
+    newSlotId: Joi.string().hex().length(24).required().messages({
+      'string.length': 'newSlotId must be a valid MongoDB ObjectId',
+      'any.required': 'newSlotId is required',
+    }),
+    notes: Joi.string().trim().max(500).optional().allow('').messages({
+      'string.max': 'Notes cannot exceed 500 characters',
+    }),
+  }),
 }
 
 module.exports = { validate, schemas }
