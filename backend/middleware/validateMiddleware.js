@@ -176,6 +176,16 @@ const schemas = {
       'string.max': 'Notes cannot exceed 500 characters',
     }),
   }),
+
+  providerRescheduleAppointment: Joi.object({
+    newSlotId: Joi.string().hex().length(24).required().messages({
+      'string.length': 'newSlotId must be a valid MongoDB ObjectId',
+      'any.required': 'newSlotId is required',
+    }),
+    reason: Joi.string().trim().max(300).optional().allow('').messages({
+      'string.max': 'Reason cannot exceed 300 characters',
+    }),
+  }),
 }
 
 module.exports = { validate, schemas }
