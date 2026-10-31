@@ -2279,3 +2279,149 @@ a:hover { color: var(--text-link-hover); }
   .appt-card-header { flex-wrap: wrap; }
   .appt-actions { flex-wrap: wrap; }
 }
+
+/* ── History Chain Timeline ────────────────────────────────────── */
+.history-chain {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: var(--sp-2) 0;
+}
+
+.history-chain-item {
+  display: flex;
+  gap: var(--sp-3);
+  position: relative;
+}
+
+.history-chain-spine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 16px;
+}
+
+.history-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(107,114,128,0.5);
+  border: 2px solid rgba(107,114,128,0.6);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.history-dot.latest {
+  background: rgba(139,92,246,0.6);
+  border-color: rgba(139,92,246,0.9);
+  box-shadow: 0 0 8px rgba(139,92,246,0.4);
+}
+
+.history-dot-line {
+  width: 1px;
+  flex: 1;
+  min-height: 20px;
+  background: rgba(255,255,255,0.08);
+  margin: 2px 0;
+}
+
+.history-chain-content {
+  flex: 1;
+  padding-bottom: var(--sp-4);
+}
+
+.history-chain-date {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--sp-1);
+}
+
+.history-chain-badge {
+  display: inline-flex;
+  margin-top: var(--sp-1);
+}
+
+/* ── Modal base ─────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7,7,15,0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--sp-4);
+  animation: fadeIn 0.2s var(--ease);
+}
+
+.modal-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--r-xl);
+  backdrop-filter: blur(24px) saturate(160%);
+  padding: var(--sp-6);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  animation: slideInUp 0.3s var(--ease);
+}
+
+.modal-card.danger {
+  border-color: rgba(248,113,113,0.2);
+}
+
+.modal-danger-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(220,38,38,0.15);
+  border: 1px solid rgba(248,113,113,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(252,165,165,0.9);
+  margin-bottom: var(--sp-4);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-4);
+}
+
+.modal-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  padding: var(--sp-1);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+
+.modal-close:hover {
+  color: var(--text-secondary);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

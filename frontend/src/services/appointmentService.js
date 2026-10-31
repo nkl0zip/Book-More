@@ -10,7 +10,11 @@ export const appointmentService = {
   // Provider
   getProviderList: (params = {}) => api.get('/appointments/provider', { params }),
   complete: (id)             => api.patch(`/appointments/${id}/complete`, {}),
+  providerReschedule: (id, data) => api.patch(`/appointments/${id}/provider-reschedule`, data),
 
   // Shared
   getById: (id)              => api.get(`/appointments/${id}`),
+  getHistory: (id)           => api.get(`/appointments/${id}/history`),
+  getCancelPolicy: (id)      => api.get(`/appointments/${id}/cancel-policy`),
+  getStats: ()               => api.get('/appointments/stats'),
 }

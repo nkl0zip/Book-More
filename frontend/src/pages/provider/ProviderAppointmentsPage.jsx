@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { appointmentService } from '../../services/appointmentService'
+import { slotService } from '../../services/slotService'
 
 /* ─── Helpers ────────────────────────────────────────────────────────── */
 const fmtDate = (d) =>
@@ -25,17 +26,47 @@ function StatusBadge({ status }) {
   )
 }
 
-/* ─── Cancel modal (provider) ────────────────────────────────────────── */
+/* ─── Toast ──────────────────────────────────────────────────────────── */
+function Toast({ message, type = 'success', onDismiss }) {
+  useEffect(() => { const t = setTimeout(onDismiss, 4000); return () => clearTimeout(t) }, [onDismiss])
+  const isSuccess = type === 'success'
+  return (
+    <div style={{
+      position: 'fixed', bottom: 'var(--sp-6)', right: 'var(--sp-6)', zIndex: 9999,
+      display: 'flex', alignItems: 'center', gap: 'var(--sp-3)',
+      padding: 'var(--sp-3) var(--sp-5)',
+      background: isSuccess ? 'rgba(16,185,129,0.18)' : 'rgba(220,38,38,0.18)',
+      border: `1px solid ${isSuccess ? 'rgba(16,185,129,0.4)' : 'rgba(248,113,113,0.4)'}`,
+      borderRadius: 'var(--r-lg)', backdropFilter: 'blur(12px)',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+      color: isSuccess ? 'rgba(52,211,153,0.95)' : 'rgba(252,165,165,0.95)',
+      fontSize: '0.9375rem', fontWeight: 500,
+      animation: 'slideInUp 0.3s var(--ease)', maxWidth: 380,
+    }}>
+      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+        {isSuccess ? <polyline points="20 6 9 17 4 12"/> : <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>}
+      </svg>
+      {message}
+      <button onClick={onDismiss} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', opacity: 0.6, padding: 0 }}>
+        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  )
+}
+
+/* ─── Cancel modal ───────────────────────────────────────────────────── */
 function CancelModal({ appointment, onClose, onDone }) {
-  const [reason, setReason]   = useState('')
-  const [submitting, setSub]  = useState(false)
-  const [error, setError]     = useState('')
+  const [reason, setReason] = useState('')
+  const [submitting, setSub] = useState(false)
+  const [error, setError]   = useState('')
 
   const handle = async () => {
     setSub(true); setError('')
     try {
       await appointmentService.cancel(appointment._id, { reason })
-      onDone()
+      onDone('Appointment cancelled successfully')
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to cancel.')
       setSub(false)
@@ -59,15 +90,16 @@ function CancelModal({ appointment, onClose, onDone }) {
         {error && <div className="glass-alert" style={{ marginBottom: 'var(--sp-3)' }}>{error}</div>}
         <div className="form-group" style={{ marginBottom: 'var(--sp-5)' }}>
           <label className="form-label">Reason (optional)</label>
-          <textarea className="form-textarea" rows={2} value={reason} onChange={e => setReason(e.target.value)} placeholder="Reason for cancellation…" />
+          <textarea className="form-textarea" rows={2} value={reason}
+            onChange={e => setReason(e.target.value)}
+            placeholder="Reason for cancellation…" />
         </div>
         <div className="modal-footer">
           <button className="glass-btn-ghost" onClick={onClose}>Keep it</button>
           <button
             className="glass-btn-primary"
             style={{ background: 'linear-gradient(135deg,#dc2626,#b91c1c)', boxShadow: '0 4px 14px rgba(220,38,38,0.35)' }}
-            onClick={handle}
-            disabled={submitting}
+            onClick={handle} disabled={submitting}
           >
             {submitting ? 'Cancelling…' : 'Yes, cancel'}
           </button>
@@ -77,18 +109,147 @@ function CancelModal({ appointment, onClose, onDone }) {
   )
 }
 
+/* ─── Provider reschedule modal ──────────────────────────────────────── */
+function ProviderRescheduleModal({ appointment, onClose, onDone }) {
+  const [slots, setSlots]             = useState([])
+  const [loading, setLoading]         = useState(true)
+  const [selectedSlot, setSelected]   = useState(null)
+  const [reason, setReason]           = useState('')
+  const [serverError, setServerError] = useState('')
+  const [submitting, setSubmitting]   = useState(false)
+
+  useEffect(() => {
+    const from = new Date().toISOString()
+    const to   = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    slotService.getMine({ from, to, available: 'true' })
+      .then(r => setSlots(r.data.data))
+      .catch(() => setSlots([]))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const grouped = slots.reduce((acc, s) => {
+    const key = new Date(s.startTime).toDateString()
+    if (!acc[key]) acc[key] = []
+    acc[key].push(s)
+    return acc
+  }, {})
+
+  const handle = async () => {
+    if (!selectedSlot) return
+    setServerError(''); setSubmitting(true)
+    try {
+      const result = await appointmentService.providerReschedule(appointment._id, {
+        newSlotId: selectedSlot._id,
+        reason,
+      })
+      onDone(`Appointment moved to ${fmtDate(result.data.data.startTime)} at ${fmtTime(result.data.data.startTime)}`)
+    } catch (err) {
+      setServerError(err.response?.data?.message || 'Reschedule failed. Please try again.')
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal-card" style={{ maxWidth: 580, maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+        <div className="modal-header">
+          <span className="modal-title">Propose New Time</span>
+          <button className="modal-close" onClick={onClose}>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 'var(--sp-4)' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: 'var(--sp-3)' }}>
+            Move <strong style={{ color: 'var(--text-primary)' }}>{appointment.patient.name}</strong>'s appointment to one of your open slots.
+            The original appointment will be marked as rescheduled.
+          </p>
+
+          <div style={{ padding: 'var(--sp-3) var(--sp-4)', background: 'rgba(107,114,128,0.1)', border: '1px solid rgba(107,114,128,0.2)', borderRadius: 'var(--r-md)', fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 'var(--sp-4)' }}>
+            Current: <strong style={{ color: 'var(--text-primary)' }}>{fmtDate(appointment.startTime)}</strong> at{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>{fmtTime(appointment.startTime)}</strong>
+          </div>
+
+          {serverError && (
+            <div className="glass-alert" role="alert" style={{ marginBottom: 'var(--sp-4)' }}>
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              {serverError}
+            </div>
+          )}
+
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)', opacity: 0.4 }}>
+              <svg className="spin" width="24" height="24" fill="none" stroke="rgba(139,92,246,0.8)" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
+              </svg>
+            </div>
+          ) : Object.keys(grouped).length === 0 ? (
+            <div className="empty-state" style={{ padding: 'var(--sp-6)' }}>
+              <div className="empty-state-title">No available slots</div>
+              <div className="empty-state-desc">Add open slots first from the My Slots page.</div>
+            </div>
+          ) : (
+            <div className="slot-picker-groups">
+              {Object.keys(grouped).map(day => (
+                <div key={day} className="slot-picker-group">
+                  <div className="slot-picker-date">{fmtDate(new Date(day))}</div>
+                  <div className="slot-picker-chips">
+                    {grouped[day].map(s => (
+                      <button
+                        key={s._id}
+                        className={`slot-picker-chip${selectedSlot?._id === s._id ? ' selected' : ''}`}
+                        onClick={() => setSelected(s)}
+                      >
+                        <span className="slot-picker-time">{fmtTime(s.startTime)}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="form-group" style={{ marginTop: 'var(--sp-4)' }}>
+            <label className="form-label">
+              Reason
+              <span style={{ color: 'var(--text-tertiary)', fontWeight: 400, marginLeft: 'var(--sp-2)' }}>(optional)</span>
+            </label>
+            <textarea className="form-textarea" rows={2}
+              value={reason} onChange={e => setReason(e.target.value)}
+              placeholder="e.g. Clinic schedule change, emergency…" />
+          </div>
+        </div>
+
+        <div className="modal-footer" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 'var(--sp-4)', marginTop: 0 }}>
+          <button className="glass-btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="glass-btn-primary" disabled={!selectedSlot || submitting} onClick={handle}>
+            {submitting ? 'Proposing…' : 'Confirm New Time'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ─── Appointment row ────────────────────────────────────────────────── */
-function ApptRow({ appt, onRefresh, idx }) {
-  const [showCancel, setShowCancel] = useState(false)
-  const [completing, setCompleting] = useState(false)
+function ApptRow({ appt, onRefresh, onToast, idx }) {
+  const [showCancel, setShowCancel]           = useState(false)
+  const [showReschedule, setShowReschedule]   = useState(false)
+  const [completing, setCompleting]           = useState(false)
   const isActive = ['confirmed', 'pending'].includes(appt.status)
 
   const handleComplete = async () => {
     setCompleting(true)
     try {
       await appointmentService.complete(appt._id)
+      onToast('Appointment marked as completed', 'success')
       onRefresh()
-    } catch {
+    } catch (err) {
+      onToast(err.response?.data?.message || 'Could not mark as completed', 'error')
       setCompleting(false)
     }
   }
@@ -142,10 +303,19 @@ function ApptRow({ appt, onRefresh, idx }) {
             <button
               className="glass-btn-primary"
               style={{ height: 32, fontSize: '0.8125rem', paddingInline: 'var(--sp-3)', background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.3)', boxShadow: 'none', color: 'rgba(52,211,153,0.9)' }}
-              onClick={handleComplete}
-              disabled={completing}
+              onClick={handleComplete} disabled={completing}
             >
               {completing ? 'Marking…' : 'Mark Completed'}
+            </button>
+            <button
+              className="glass-btn-ghost"
+              style={{ height: 32, fontSize: '0.8125rem', paddingInline: 'var(--sp-3)', gap: 'var(--sp-1)' }}
+              onClick={() => setShowReschedule(true)}
+            >
+              <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.29"/>
+              </svg>
+              Propose New Time
             </button>
             <button
               className="glass-btn-ghost"
@@ -162,7 +332,14 @@ function ApptRow({ appt, onRefresh, idx }) {
         <CancelModal
           appointment={appt}
           onClose={() => setShowCancel(false)}
-          onDone={() => { setShowCancel(false); onRefresh() }}
+          onDone={(msg) => { setShowCancel(false); onToast(msg, 'success'); onRefresh() }}
+        />
+      )}
+      {showReschedule && (
+        <ProviderRescheduleModal
+          appointment={appt}
+          onClose={() => setShowReschedule(false)}
+          onDone={(msg) => { setShowReschedule(false); onToast(msg, 'success'); onRefresh() }}
         />
       )}
     </>
@@ -170,18 +347,15 @@ function ApptRow({ appt, onRefresh, idx }) {
 }
 
 /* ─── Stats bar ──────────────────────────────────────────────────────── */
-function StatsBar({ appointments }) {
-  const confirmed  = appointments.filter(a => a.status === 'confirmed').length
-  const completed  = appointments.filter(a => a.status === 'completed').length
-  const cancelled  = appointments.filter(a => a.status === 'cancelled').length
-
+function StatsBar({ stats }) {
+  if (!stats) return null
   return (
     <div className="stat-grid" style={{ marginBottom: 'var(--sp-6)', animation: 'slideInUp 0.4s var(--ease) 60ms both' }}>
       {[
-        { label: 'Upcoming',  value: confirmed,  color: 'rgba(167,139,250,0.9)' },
-        { label: 'Completed', value: completed,  color: 'rgba(52,211,153,0.9)'  },
-        { label: 'Cancelled', value: cancelled,  color: 'rgba(252,165,165,0.8)' },
-        { label: 'Total',     value: appointments.length, color: 'var(--text-primary)' },
+        { label: 'Upcoming',   value: stats.confirmed,          color: 'rgba(167,139,250,0.9)' },
+        { label: 'Completed',  value: stats.completed,          color: 'rgba(52,211,153,0.9)'  },
+        { label: 'Cancelled',  value: stats.cancelled,          color: 'rgba(252,165,165,0.8)' },
+        { label: 'Cancel Rate',value: `${stats.cancellationRate}%`, color: stats.cancellationRate > 20 ? 'rgba(252,165,165,0.8)' : 'rgba(52,211,153,0.9)' },
       ].map(s => (
         <div key={s.label} className="stat-card">
           <div className="stat-value" style={{ color: s.color }}>{s.value}</div>
@@ -195,35 +369,40 @@ function StatsBar({ appointments }) {
 /* ─── Main Page ──────────────────────────────────────────────────────── */
 export default function ProviderAppointmentsPage() {
   const [appointments, setAppointments] = useState([])
-  const [allAppts, setAllAppts]         = useState([])
+  const [stats, setStats]               = useState(null)
   const [loading, setLoading]           = useState(true)
-  const [statusFilter, setStatusFilter] = useState('active')
+  const [statusFilter, setStatusFilter] = useState('upcoming')
+  const [toast, setToast]               = useState(null)
+
+  const loadStats = useCallback(() => {
+    appointmentService.getStats()
+      .then(r => setStats(r.data.data))
+      .catch(() => {})
+  }, [])
 
   const load = useCallback(() => {
     setLoading(true)
     const params = {}
-    if (statusFilter === 'active')    params.status = 'confirmed'
-    if (statusFilter === 'completed') params.status = 'completed'
-    if (statusFilter === 'cancelled') params.status = 'cancelled'
-    Promise.all([
-      appointmentService.getProviderList(params),
-      appointmentService.getProviderList({ limit: 200 }),
-    ]).then(([filtered, all]) => {
-      setAppointments(filtered.data.data)
-      setAllAppts(all.data.data)
-    }).catch(() => {
-      setAppointments([])
-      setAllAppts([])
-    }).finally(() => setLoading(false))
+    if (statusFilter === 'upcoming')   params.status = 'confirmed,pending'
+    if (statusFilter === 'completed')  params.status = 'completed'
+    if (statusFilter === 'cancelled')  params.status = 'cancelled'
+    if (statusFilter === 'rescheduled') params.status = 'rescheduled'
+    appointmentService.getProviderList(params)
+      .then(r => setAppointments(r.data.data))
+      .catch(() => setAppointments([]))
+      .finally(() => setLoading(false))
   }, [statusFilter])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { load(); loadStats() }, [load, loadStats])
+
+  const showToast = useCallback((message, type = 'success') => setToast({ message, type }), [])
 
   const tabs = [
-    { key: 'active',    label: 'Upcoming' },
-    { key: 'completed', label: 'Completed' },
-    { key: 'cancelled', label: 'Cancelled' },
-    { key: 'all',       label: 'All' },
+    { key: 'upcoming',    label: 'Upcoming'    },
+    { key: 'rescheduled', label: 'Rescheduled' },
+    { key: 'completed',   label: 'Completed'   },
+    { key: 'cancelled',   label: 'Cancelled'   },
+    { key: 'all',         label: 'All'         },
   ]
 
   return (
@@ -238,10 +417,10 @@ export default function ProviderAppointmentsPage() {
         <div className="page-container">
           <div className="page-header">
             <h1 className="page-title">My Appointments</h1>
-            <p className="page-subtitle">Manage patient appointments, mark completions, and cancel if needed.</p>
+            <p className="page-subtitle">Manage patient appointments, propose new times, and track outcomes.</p>
           </div>
 
-          <StatsBar appointments={allAppts} />
+          <StatsBar stats={stats} />
 
           <div className="glass-tabs" style={{ animation: 'slideInUp 0.4s var(--ease) 80ms both' }}>
             {tabs.map(t => (
@@ -272,7 +451,7 @@ export default function ProviderAppointmentsPage() {
                 </div>
                 <div className="empty-state-title">No appointments here</div>
                 <div className="empty-state-desc">
-                  {statusFilter === 'active'
+                  {statusFilter === 'upcoming'
                     ? 'No upcoming appointments. Patients will appear here when they book a slot.'
                     : `No ${statusFilter} appointments found.`}
                 </div>
@@ -281,12 +460,16 @@ export default function ProviderAppointmentsPage() {
           ) : (
             <div className="appt-list">
               {appointments.map((a, i) => (
-                <ApptRow key={a._id} appt={a} onRefresh={load} idx={i} />
+                <ApptRow key={a._id} appt={a} onRefresh={load} onToast={showToast} idx={i} />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />
+      )}
     </>
   )
 }
