@@ -1,6 +1,8 @@
 const Appointment = require('../models/Appointment')
 const Slot = require('../models/Slot')
 const Service = require('../models/Service')
+const { sendEmail } = require('../utils/emailService')
+const templates = require('../utils/emailTemplates')
 
 /* ─── State machine ───────────────────────────────────────────────────────── */
 const TRANSITIONS = {
@@ -71,6 +73,17 @@ const bookAppointment = async (req, res) => {
   await slot.save({ validateBeforeSave: false })
 
   const populated = await populateFull(Appointment.findById(appointment._id))
+
+  // Fire-and-forget emails — never block the API response
+  if (populated.patient?.email) {
+    const t = templates.bookingConfirmationPatient(populated)
+    sendEmail({ to: populated.patient.email, ...t })
+  }
+  if (populated.provider?.email) {
+    const t = templates.bookingNotificationProvider(populated)
+    sendEmail({ to: populated.provider.email, ...t })
+  }
+
   return res.status(201).json({ success: true, data: populated })
 }
 
@@ -228,6 +241,17 @@ const cancelAppointment = async (req, res) => {
   await Slot.findByIdAndUpdate(appointment.slot, { isBooked: false })
 
   const populated = await populateFull(Appointment.findById(appointment._id))
+
+  // Notify both parties of cancellation
+  if (populated.patient?.email) {
+    const t = templates.cancellationPatient(populated)
+    sendEmail({ to: populated.patient.email, ...t })
+  }
+  if (populated.provider?.email) {
+    const t = templates.cancellationProvider(populated)
+    sendEmail({ to: populated.provider.email, ...t })
+  }
+
   return res.status(200).json({ success: true, data: populated })
 }
 
@@ -267,6 +291,10 @@ const rescheduleAppointment = async (req, res) => {
   const slotConflict = await Appointment.findOne({ slot: newSlotId, status: { $in: ['confirmed', 'pending'] } })
   if (slotConflict) return res.status(409).json({ success: false, message: 'The selected slot is already booked' })
 
+  // Snapshot original times before mutation for reschedule email
+  const originalStartTime = original.startTime
+  const originalEndTime   = original.endTime
+
   const newAppointment = await Appointment.create({
     patient: original.patient,
     provider: original.provider,
@@ -288,6 +316,18 @@ const rescheduleAppointment = async (req, res) => {
   await Slot.findByIdAndUpdate(original.slot, { isBooked: false })
 
   const populated = await populateFull(Appointment.findById(newAppointment._id))
+
+  // Notify both parties of the reschedule
+  const oldTimeSummary = { startTime: originalStartTime, endTime: originalEndTime }
+  if (populated.patient?.email) {
+    const t = templates.reschedulePatient(populated, oldTimeSummary)
+    sendEmail({ to: populated.patient.email, ...t })
+  }
+  if (populated.provider?.email) {
+    const t = templates.rescheduleProvider(populated, oldTimeSummary)
+    sendEmail({ to: populated.provider.email, ...t })
+  }
+
   return res.status(200).json({ success: true, data: populated })
 }
 
@@ -323,6 +363,10 @@ const providerRescheduleAppointment = async (req, res) => {
   const slotConflict = await Appointment.findOne({ slot: newSlotId, status: { $in: ['confirmed', 'pending'] } })
   if (slotConflict) return res.status(409).json({ success: false, message: 'The selected slot is already booked' })
 
+  // Snapshot original times before mutation for reschedule email
+  const provOriginalStartTime = original.startTime
+  const provOriginalEndTime   = original.endTime
+
   const newAppointment = await Appointment.create({
     patient: original.patient,
     provider: original.provider,
@@ -347,6 +391,14 @@ const providerRescheduleAppointment = async (req, res) => {
   await Slot.findByIdAndUpdate(original.slot, { isBooked: false })
 
   const populated = await populateFull(Appointment.findById(newAppointment._id))
+
+  // Notify both parties — provider initiated so patient is primary recipient
+  const oldTimeSummary = { startTime: provOriginalStartTime, endTime: provOriginalEndTime }
+  if (populated.patient?.email) {
+    const t = templates.reschedulePatient(populated, oldTimeSummary)
+    sendEmail({ to: populated.patient.email, ...t })
+  }
+
   return res.status(200).json({ success: true, data: populated })
 }
 
