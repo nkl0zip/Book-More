@@ -12,6 +12,7 @@ import ProviderSlotsPage from './pages/provider/ProviderSlotsPage'
 import ProviderAppointmentsPage from './pages/provider/ProviderAppointmentsPage'
 import PatientBookingPage from './pages/patient/PatientBookingPage'
 import PatientAppointmentsPage from './pages/patient/PatientAppointmentsPage'
+import NotificationsPage from './pages/shared/NotificationsPage'
 import { useAuth } from './context/AuthContext'
 
 function HomePage() {
@@ -123,6 +124,15 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['patient']}>
               <PatientAppointmentsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/settings/notifications"
+          element={
+            <ProtectedRoute allowedRoles={['patient', 'provider']}>
+              <NotificationsPage />
             </ProtectedRoute>
           }
         />
