@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['patient', 'provider'],
+      enum: ['patient', 'provider', 'admin'],
       default: 'patient',
     },
     // Provider-specific fields

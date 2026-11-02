@@ -10,6 +10,7 @@ const serviceRoutes  = require('./routes/serviceRoutes')
 const slotRoutes        = require('./routes/slotRoutes')
 const appointmentRoutes = require('./routes/appointmentRoutes')
 const dashboardRoutes   = require('./routes/dashboardRoutes')
+const adminRoutes       = require('./routes/adminRoutes')
 
 const app = express()
 
@@ -37,6 +38,7 @@ app.use('/api/services',  serviceRoutes)
 app.use('/api/slots',        slotRoutes)
 app.use('/api/appointments', appointmentRoutes)
 app.use('/api/dashboard',    dashboardRoutes)
+app.use('/api/admin',        adminRoutes)
 
 // Error handling
 app.use(notFound)
