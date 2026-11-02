@@ -27,7 +27,10 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   }
 
   if (allowedRoles && !allowedRoles.includes(user?.role)) {
-    const fallback = user?.role === 'provider' ? '/provider/dashboard' : '/patient/dashboard'
+    const fallback =
+      user?.role === 'admin'    ? '/admin' :
+      user?.role === 'provider' ? '/provider/dashboard' :
+                                  '/patient/dashboard'
     return <Navigate to={fallback} replace />
   }
 

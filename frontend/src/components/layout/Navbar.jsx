@@ -47,7 +47,13 @@ export default function Navbar() {
     { to: '/provider/profile',        label: 'My Profile'     },
     { to: '/settings/notifications',  label: 'Notifications'  },
   ]
-  const navLinks = user?.role === 'provider' ? providerLinks : patientLinks
+  const adminLinks = [
+    { to: '/admin', label: 'Overview' },
+  ]
+  const navLinks =
+    user?.role === 'admin'    ? adminLinks :
+    user?.role === 'provider' ? providerLinks :
+                                patientLinks
 
   return (
     <nav className="glass-navbar">
@@ -77,7 +83,7 @@ export default function Navbar() {
         <div className="navbar-actions">
           {isAuthenticated ? (
             <div className="navbar-user">
-              <div className="navbar-avatar">{getInitials(user?.name)}</div>
+              <div className="navbar-avatar" style={user?.role === 'admin' ? { background: 'rgba(244,63,94,0.2)', border: '1px solid rgba(244,63,94,0.3)', color: 'rgba(251,113,133,0.9)' } : undefined}>{getInitials(user?.name)}</div>
               <span className="navbar-user-name">{user?.name?.split(' ')[0]}</span>
               <button
                 className="btn glass-btn-ghost"

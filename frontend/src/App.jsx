@@ -13,12 +13,15 @@ import ProviderAppointmentsPage from './pages/provider/ProviderAppointmentsPage'
 import PatientBookingPage from './pages/patient/PatientBookingPage'
 import PatientAppointmentsPage from './pages/patient/PatientAppointmentsPage'
 import NotificationsPage from './pages/shared/NotificationsPage'
+import AdminPanel from './pages/admin/AdminPanel'
 import { useAuth } from './context/AuthContext'
 
 function HomePage() {
   const { isAuthenticated, user } = useAuth()
   if (isAuthenticated) {
-    return <Navigate to={user?.role === 'provider' ? '/provider/dashboard' : '/patient/dashboard'} replace />
+    if (user?.role === 'admin')    return <Navigate to="/admin" replace />
+    if (user?.role === 'provider') return <Navigate to="/provider/dashboard" replace />
+    return <Navigate to="/patient/dashboard" replace />
   }
   return <Navigate to="/login" replace />
 }
@@ -133,6 +136,15 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['patient', 'provider']}>
               <NotificationsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminPanel />
             </ProtectedRoute>
           }
         />
