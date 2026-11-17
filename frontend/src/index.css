@@ -1319,6 +1319,7 @@ a:hover { color: var(--text-link-hover); }
   flex-shrink: 0;
   box-shadow: 0 3px 14px var(--accent-glow);
   border: 1.5px solid rgba(255,255,255,0.2);
+  overflow: hidden;
 }
 
 .provider-card-name {
@@ -2277,6 +2278,7 @@ a:hover { color: var(--text-link-hover); }
   color: white;
   flex-shrink: 0;
   letter-spacing: 0.02em;
+  overflow: hidden;
 }
 
 .appt-provider-name {

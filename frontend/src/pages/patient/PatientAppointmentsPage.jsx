@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { appointmentService } from '../../services/appointmentService'
 import { slotService } from '../../services/slotService'
+import { Spinner } from '../../components/ui/Spinner'
 
 /* ─── Helpers ────────────────────────────────────────────────────────── */
 const fmtDate = (d) =>
@@ -10,7 +11,6 @@ const fmtDate = (d) =>
 const fmtTime = (d) =>
   new Date(d).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 
-/** Returns a human-readable "2h 15m left" string from ms */
 const fmtCountdown = (ms) => {
   if (ms <= 0) return null
   const h = Math.floor(ms / (1000 * 60 * 60))
@@ -101,10 +101,8 @@ function HistoryPanel({ appointmentId, onClose }) {
         </div>
 
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)', opacity: 0.4 }}>
-            <svg className="spin" width="24" height="24" fill="none" stroke="rgba(139,92,246,0.8)" strokeWidth="2" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
-            </svg>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)' }}>
+            <Spinner />
           </div>
         ) : chain.length === 0 ? (
           <p style={{ color: 'var(--text-secondary)', padding: 'var(--sp-4) 0' }}>No history found.</p>
@@ -141,7 +139,7 @@ function HistoryPanel({ appointmentId, onClose }) {
         )}
 
         <div className="modal-footer" style={{ marginTop: 'var(--sp-4)' }}>
-          <button className="glass-btn-primary" onClick={onClose}>Close</button>
+          <button className="btn glass-btn-primary" onClick={onClose}>Close</button>
         </div>
       </div>
     </div>
@@ -178,7 +176,6 @@ function CancelModal({ appointment, policy, onClose, onDone }) {
           <strong style={{ color: 'var(--text-primary)' }}>{fmtDate(appointment.startTime)}</strong>?
         </p>
 
-        {/* Countdown warning */}
         {policy && policy.msRemaining > 0 && policy.msRemaining < 4 * 60 * 60 * 1000 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', padding: 'var(--sp-3) var(--sp-4)', marginBottom: 'var(--sp-4)', background: 'rgba(180,130,20,0.15)', border: '1px solid rgba(251,191,36,0.25)', borderRadius: 'var(--r-md)', fontSize: '0.8125rem', color: 'rgba(253,211,77,0.9)' }}>
             <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -189,7 +186,7 @@ function CancelModal({ appointment, policy, onClose, onDone }) {
         )}
 
         {serverError && (
-          <div className="glass-alert" role="alert" style={{ marginBottom: 'var(--sp-4)' }}>
+          <div className="glass-alert glass-alert-error" role="alert" style={{ marginBottom: 'var(--sp-4)' }}>
             <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
@@ -212,10 +209,10 @@ function CancelModal({ appointment, policy, onClose, onDone }) {
             />
           </div>
           <div className="modal-footer">
-            <button type="button" className="glass-btn-ghost" onClick={onClose}>Keep it</button>
+            <button type="button" className="btn glass-btn-ghost" onClick={onClose}>Keep it</button>
             <button
               type="submit"
-              className="glass-btn-primary"
+              className="btn glass-btn-primary"
               style={{ background: 'linear-gradient(135deg,#dc2626,#b91c1c)', boxShadow: '0 4px 14px rgba(220,38,38,0.35)' }}
               disabled={isSubmitting}
             >
@@ -290,14 +287,13 @@ function RescheduleModal({ appointment, onClose, onDone }) {
             The current appointment will be marked as rescheduled.
           </p>
 
-          {/* Current slot summary */}
           <div style={{ padding: 'var(--sp-3) var(--sp-4)', background: 'rgba(107,114,128,0.1)', border: '1px solid rgba(107,114,128,0.2)', borderRadius: 'var(--r-md)', fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 'var(--sp-4)' }}>
             Current: <strong style={{ color: 'var(--text-primary)' }}>{fmtDate(appointment.startTime)}</strong> at{' '}
             <strong style={{ color: 'var(--text-primary)' }}>{fmtTime(appointment.startTime)}</strong>
           </div>
 
           {serverError && (
-            <div className="glass-alert" role="alert" style={{ marginBottom: 'var(--sp-4)' }}>
+            <div className="glass-alert glass-alert-error" role="alert" style={{ marginBottom: 'var(--sp-4)' }}>
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
@@ -306,10 +302,8 @@ function RescheduleModal({ appointment, onClose, onDone }) {
           )}
 
           {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)', opacity: 0.4 }}>
-              <svg className="spin" width="24" height="24" fill="none" stroke="rgba(139,92,246,0.8)" strokeWidth="2" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
-              </svg>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)' }}>
+              <Spinner />
             </div>
           ) : Object.keys(grouped).length === 0 ? (
             <div className="empty-state" style={{ padding: 'var(--sp-6)' }}>
@@ -353,9 +347,9 @@ function RescheduleModal({ appointment, onClose, onDone }) {
         </div>
 
         <div className="modal-footer" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 'var(--sp-4)', marginTop: 0 }}>
-          <button className="glass-btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="btn glass-btn-ghost" onClick={onClose}>Cancel</button>
           <button
-            className="glass-btn-primary"
+            className="btn glass-btn-primary"
             disabled={!selectedSlot || submitting}
             onClick={handleReschedule}
           >
@@ -386,15 +380,14 @@ function useCountdown(deadlineISO) {
 
 /* ─── Appointment card ───────────────────────────────────────────────── */
 function AppointmentCard({ appointment, onRefresh, onToast }) {
-  const [showCancel, setShowCancel]     = useState(false)
+  const [showCancel, setShowCancel]         = useState(false)
   const [showReschedule, setShowReschedule] = useState(false)
-  const [showHistory, setShowHistory]   = useState(false)
-  const [policy, setPolicy]             = useState(null)
+  const [showHistory, setShowHistory]       = useState(false)
+  const [policy, setPolicy]                 = useState(null)
 
   const hasChain = !!(appointment.rescheduledFrom || appointment.rescheduledTo)
   const isActive = ['confirmed', 'pending'].includes(appointment.status)
 
-  // Fetch cancellation policy for active appointments
   useEffect(() => {
     if (!isActive) return
     appointmentService.getCancelPolicy(appointment._id)
@@ -405,16 +398,26 @@ function AppointmentCard({ appointment, onRefresh, onToast }) {
   const msRemaining = useCountdown(policy?.deadlineISO)
   const countdown   = isActive ? fmtCountdown(msRemaining) : null
 
-  // Derive actionability from live countdown
-  const canCancel    = policy?.canCancel     && msRemaining > 0
-  const canReschedule= policy?.canReschedule && msRemaining > 0
+  const canCancel     = policy?.canCancel     && msRemaining > 0
+  const canReschedule = policy?.canReschedule && msRemaining > 0
+
+  const providerInitials = appointment.provider.name
+    .split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
 
   return (
     <div className={`appt-card${!isActive ? ' dim' : ''}`}>
       <div className="appt-card-header">
         <div className="appt-provider-info">
           <div className="appt-avatar">
-            {appointment.provider.name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase()}
+            {appointment.provider.avatarUrl
+              ? <img
+                  src={appointment.provider.avatarUrl}
+                  alt={appointment.provider.name}
+                  style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                  onError={e => { e.target.style.display = 'none' }}
+                />
+              : providerInitials
+            }
           </div>
           <div>
             <div className="appt-provider-name">{appointment.provider.name}</div>
@@ -426,8 +429,8 @@ function AppointmentCard({ appointment, onRefresh, onToast }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
           {hasChain && (
             <button
-              className="glass-btn-ghost"
-              style={{ height: 26, paddingInline: 'var(--sp-2)', fontSize: '0.75rem', gap: 'var(--sp-1)' }}
+              className="btn glass-btn-ghost"
+              style={{ height: 28, paddingInline: 'var(--sp-2)', fontSize: '0.75rem', gap: 'var(--sp-1)' }}
               onClick={() => setShowHistory(true)}
               title="View rescheduling history"
             >
@@ -469,7 +472,6 @@ function AppointmentCard({ appointment, onRefresh, onToast }) {
         </p>
       )}
 
-      {/* Countdown badge */}
       {countdown && (
         <div style={{ marginTop: 'var(--sp-3)', display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', fontSize: '0.75rem', color: msRemaining < 2 * 60 * 60 * 1000 ? 'rgba(253,211,77,0.8)' : 'var(--text-tertiary)' }}>
           <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -483,19 +485,25 @@ function AppointmentCard({ appointment, onRefresh, onToast }) {
         <div className="appt-actions">
           {canReschedule && (
             <button
-              className="glass-btn-ghost"
-              style={{ height: 32, fontSize: '0.8125rem', paddingInline: 'var(--sp-3)' }}
+              className="btn glass-btn-ghost"
+              style={{ height: 34, fontSize: '0.8125rem', paddingInline: 'var(--sp-4)' }}
               onClick={() => setShowReschedule(true)}
             >
+              <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.29"/>
+              </svg>
               Reschedule
             </button>
           )}
           {canCancel ? (
             <button
-              className="glass-btn-ghost"
-              style={{ height: 32, fontSize: '0.8125rem', paddingInline: 'var(--sp-3)', color: 'rgba(252,165,165,0.8)', borderColor: 'rgba(248,113,113,0.25)' }}
+              className="btn glass-btn-ghost"
+              style={{ height: 34, fontSize: '0.8125rem', paddingInline: 'var(--sp-4)', color: 'rgba(252,165,165,0.8)', borderColor: 'rgba(248,113,113,0.25)' }}
               onClick={() => setShowCancel(true)}
             >
+              <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
               Cancel
             </button>
           ) : policy && !policy.canCancel && (
@@ -549,17 +557,15 @@ export default function PatientAppointmentsPage() {
   const [appointments, setAppointments] = useState([])
   const [loading, setLoading]           = useState(true)
   const [statusFilter, setStatusFilter] = useState('upcoming')
-  const [toast, setToast]               = useState(null) // { message, type }
+  const [toast, setToast]               = useState(null)
 
   const load = useCallback(() => {
     setLoading(true)
     const params = {}
-    // Map tab keys to status query values
-    if (statusFilter === 'upcoming')   params.status = 'confirmed,pending'
-    if (statusFilter === 'completed')  params.status = 'completed'
-    if (statusFilter === 'cancelled')  params.status = 'cancelled'
+    if (statusFilter === 'upcoming')    params.status = 'confirmed,pending'
+    if (statusFilter === 'completed')   params.status = 'completed'
+    if (statusFilter === 'cancelled')   params.status = 'cancelled'
     if (statusFilter === 'rescheduled') params.status = 'rescheduled'
-    // 'all' — omit status param to get everything
     appointmentService.getMine(params)
       .then(r => setAppointments(r.data.data))
       .catch(() => setAppointments([]))
@@ -595,7 +601,7 @@ export default function PatientAppointmentsPage() {
               <h1 className="page-title">My Appointments</h1>
               <p className="page-subtitle">View, reschedule, or cancel your booked appointments.</p>
             </div>
-            <Link to="/patient/book" className="glass-btn-primary" style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', height: 40, paddingInline: 'var(--sp-5)' }}>
+            <Link to="/patient/book" className="btn glass-btn-primary" style={{ textDecoration: 'none', flexShrink: 0 }}>
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
@@ -616,10 +622,8 @@ export default function PatientAppointmentsPage() {
           </div>
 
           {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-12)', opacity: 0.4 }}>
-              <svg className="spin" width="28" height="28" fill="none" stroke="rgba(139,92,246,0.8)" strokeWidth="2" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
-              </svg>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-12)' }}>
+              <Spinner size={28} />
             </div>
           ) : appointments.length === 0 ? (
             <div className="content-card" style={{ animation: 'slideInUp 0.4s var(--ease) 120ms both' }}>
@@ -637,7 +641,10 @@ export default function PatientAppointmentsPage() {
                     : `No ${statusFilter} appointments found.`}
                 </div>
                 {statusFilter === 'upcoming' && (
-                  <Link to="/patient/book" className="glass-btn-primary" style={{ marginTop: 'var(--sp-4)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
+                  <Link to="/patient/book" className="btn glass-btn-primary" style={{ marginTop: 'var(--sp-4)', textDecoration: 'none' }}>
+                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
                     Book an appointment
                   </Link>
                 )}

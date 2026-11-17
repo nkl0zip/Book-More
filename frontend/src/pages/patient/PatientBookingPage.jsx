@@ -13,6 +13,37 @@ const fmtTime = (d) =>
 const fmtDuration = (mins) =>
   mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)}h${mins % 60 ? ` ${mins % 60}min` : ''}`
 
+/**
+ * Expand a slot into bookable time chips.
+ * If the slot has a service, use durationMinutes as the chunk size.
+ * Otherwise default to 60-min chunks.
+ * Returns an array of { slotId, startTime, endTime, service } objects.
+ */
+const CHIP_INTERVAL = 60 // minutes fallback
+const expandSlot = (slot) => {
+  const chunkMs = (slot.service?.durationMinutes ?? CHIP_INTERVAL) * 60 * 1000
+  const start   = new Date(slot.startTime).getTime()
+  const end     = new Date(slot.endTime).getTime()
+  const slotLen = end - start
+  if (slotLen <= chunkMs) {
+    // Already short enough — return as-is
+    return [{ slotId: slot._id, startTime: slot.startTime, endTime: slot.endTime, service: slot.service, _id: slot._id }]
+  }
+  const chips = []
+  let cursor = start
+  while (cursor + chunkMs <= end) {
+    chips.push({
+      _id:       slot._id,          // same slot ID — booking targets the parent slot
+      slotId:    slot._id,
+      startTime: new Date(cursor).toISOString(),
+      endTime:   new Date(cursor + chunkMs).toISOString(),
+      service:   slot.service,
+    })
+    cursor += chunkMs
+  }
+  return chips
+}
+
 /* ─── Icons ──────────────────────────────────────────────────────────── */
 const IconSearch = () => (
   <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -62,7 +93,7 @@ function PickProvider({ onSelect }) {
 
   useEffect(() => {
     api.get('/providers')
-      .then(r => setProviders(r.data.data))
+      .then(r => setProviders(r.data.providers ?? r.data.data ?? []))
       .catch(() => setProviders([]))
       .finally(() => setLoading(false))
   }, [])
@@ -105,13 +136,18 @@ function PickProvider({ onSelect }) {
         <div className="provider-grid">
           {filtered.map(p => (
             <div key={p._id} className="provider-card" onClick={() => onSelect(p)} style={{ cursor: 'pointer' }}>
-              <div className="provider-avatar">{p.name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase()}</div>
+              <div className="provider-avatar">
+                {p.avatarUrl
+                  ? <img src={p.avatarUrl} alt={p.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none' }} />
+                  : p.name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase()
+                }
+              </div>
               <div className="provider-info">
                 <div className="provider-name">{p.name}</div>
                 {p.specialisation && <div className="provider-spec">{p.specialisation}</div>}
                 {p.bio && <div className="provider-bio">{p.bio.slice(0, 80)}{p.bio.length > 80 ? '…' : ''}</div>}
               </div>
-              <button className="glass-btn-primary" style={{ marginTop: 'var(--sp-4)', width: '100%' }}>
+              <button className="btn glass-btn-primary" style={{ marginTop: 'var(--sp-4)', width: '100%', justifyContent: 'center' }}>
                 Select
               </button>
             </div>
@@ -142,10 +178,10 @@ function PickSlot({ provider, onSelect, onBack }) {
 
   useEffect(() => { load() }, [load])
 
-  const grouped = slots.reduce((acc, s) => {
-    const key = new Date(s.startTime).toDateString()
+  const grouped = slots.flatMap(expandSlot).reduce((acc, chip) => {
+    const key = new Date(chip.startTime).toDateString()
     if (!acc[key]) acc[key] = []
-    acc[key].push(s)
+    acc[key].push(chip)
     return acc
   }, {})
   const groupKeys = Object.keys(grouped)
@@ -155,14 +191,17 @@ function PickSlot({ provider, onSelect, onBack }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)', marginBottom: 'var(--sp-6)', flexWrap: 'wrap' }}>
         <div className="provider-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 'var(--sp-3)', padding: 'var(--sp-3) var(--sp-4)', flex: 1 }}>
           <div className="provider-avatar" style={{ width: 36, height: 36, fontSize: '0.875rem', flexShrink: 0 }}>
-            {provider.name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase()}
+            {provider.avatarUrl
+              ? <img src={provider.avatarUrl} alt={provider.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none' }} />
+              : provider.name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase()
+            }
           </div>
           <div>
             <div className="provider-name" style={{ fontSize: '0.9375rem' }}>{provider.name}</div>
             {provider.specialisation && <div className="provider-spec" style={{ fontSize: '0.8125rem' }}>{provider.specialisation}</div>}
           </div>
         </div>
-        <button className="glass-btn-ghost" style={{ height: 36, gap: 'var(--sp-2)', flexShrink: 0 }} onClick={onBack}>
+        <button className="btn glass-btn-ghost" style={{ height: 36, gap: 'var(--sp-2)', flexShrink: 0 }} onClick={onBack}>
           <IconChevLeft /> Change provider
         </button>
       </div>
@@ -170,7 +209,7 @@ function PickSlot({ provider, onSelect, onBack }) {
       {/* Date range nav */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)', marginBottom: 'var(--sp-5)' }}>
         <button
-          className="glass-btn-ghost"
+          className="btn glass-btn-ghost"
           style={{ height: 34, paddingInline: 'var(--sp-3)', fontSize: '0.8125rem' }}
           onClick={() => setFromDate(d => { const n = new Date(d); n.setDate(n.getDate()-14); return n })}
           disabled={fromDate <= new Date()}
@@ -179,7 +218,7 @@ function PickSlot({ provider, onSelect, onBack }) {
           Next 14 days from {fromDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
         </span>
         <button
-          className="glass-btn-ghost"
+          className="btn glass-btn-ghost"
           style={{ height: 34, paddingInline: 'var(--sp-3)', fontSize: '0.8125rem' }}
           onClick={() => setFromDate(d => { const n = new Date(d); n.setDate(n.getDate()+14); return n })}
         >Later →</button>
@@ -257,7 +296,7 @@ function ConfirmBooking({ provider, slot, onBack, onBooked }) {
 
   return (
     <div>
-      <button className="glass-btn-ghost" style={{ height: 34, gap: 'var(--sp-2)', marginBottom: 'var(--sp-6)', fontSize: '0.8125rem' }} onClick={onBack}>
+      <button className="btn glass-btn-ghost" style={{ height: 34, gap: 'var(--sp-2)', marginBottom: 'var(--sp-6)', fontSize: '0.8125rem' }} onClick={onBack}>
         <IconChevLeft /> Back to slots
       </button>
 
@@ -295,11 +334,12 @@ function ConfirmBooking({ provider, slot, onBack, onBooked }) {
           <select
             id="bk-service"
             {...register('serviceId')}
-            style={{ width: '100%', height: 46, background: 'var(--glass-bg-input)', border: '1px solid var(--glass-border)', borderRadius: 'var(--r-md)', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)', fontSize: '0.9375rem', padding: '0 var(--sp-4)', outline: 'none', cursor: 'pointer' }}
+            className="form-input"
+            style={{ width: '100%', cursor: 'pointer' }}
           >
-            <option value="" style={{ background: '#1a1a2e' }}>— No specific service —</option>
+            <option value="">— No specific service —</option>
             {services.filter(s => s.isActive).map(s => (
-              <option key={s._id} value={s._id} style={{ background: '#1a1a2e' }}>
+              <option key={s._id} value={s._id}>
                 {s.name} — {fmtDuration(s.durationMinutes)} · {s.currency} {s.price}
               </option>
             ))}
@@ -320,7 +360,7 @@ function ConfirmBooking({ provider, slot, onBack, onBooked }) {
           />
         </div>
 
-        <button type="submit" className="glass-btn-primary" style={{ width: '100%', justifyContent: 'center', height: 48 }} disabled={isSubmitting}>
+        <button type="submit" className="btn glass-btn-primary" style={{ width: '100%', justifyContent: 'center', height: 48 }} disabled={isSubmitting}>
           {isSubmitting ? (
             <>
               <svg className="spin" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -352,10 +392,10 @@ function BookingSuccess({ appointment, onBookAnother }) {
         <strong style={{ color: 'var(--text-primary)' }}>{fmtTime(appointment.startTime)}</strong> is confirmed.
       </p>
       <div style={{ display: 'flex', gap: 'var(--sp-3)', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button className="glass-btn-primary" onClick={() => navigate('/patient/appointments')}>
+        <button className="btn glass-btn-primary" onClick={() => navigate('/patient/appointments')}>
           View My Appointments
         </button>
-        <button className="glass-btn-ghost" onClick={onBookAnother}>
+        <button className="btn glass-btn-ghost" onClick={onBookAnother}>
           Book Another
         </button>
       </div>

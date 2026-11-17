@@ -20,7 +20,10 @@ export default function FindProvidersPage() {
 
     providerService.getAll(params)
       .then(res => {
-        setProviders(res.data.data)
+        const list = res.data.providers ?? res.data.data ?? []
+        // deduplicate by _id in case of duplicate DB entries
+        const seen = new Set()
+        setProviders(list.filter(p => seen.has(p._id) ? false : seen.add(p._id)))
         setTotal(res.data.total || 0)
       })
       .catch(() => setProviders([]))
@@ -88,7 +91,7 @@ export default function FindProvidersPage() {
                   onChange={e => setSearchInput(e.target.value)}
                 />
               </div>
-              <button type="submit" className="glass-btn-primary" style={{ flexShrink: 0 }}>Search</button>
+              <button type="submit" className="btn glass-btn-primary" style={{ flexShrink: 0 }}>Search</button>
             </form>
 
             <select
@@ -114,7 +117,7 @@ export default function FindProvidersPage() {
             </select>
 
             {(search || specialisation) && (
-              <button type="button" className="glass-btn-ghost" onClick={clearFilters} style={{ flexShrink: 0 }}>
+              <button type="button" className="btn glass-btn-ghost" onClick={clearFilters} style={{ flexShrink: 0 }}>
                 Clear filters
               </button>
             )}
@@ -160,7 +163,7 @@ export default function FindProvidersPage() {
                     : 'There are no registered providers yet. Check back soon.'}
                 </div>
                 {(search || specialisation) && (
-                  <button className="glass-btn-secondary" onClick={clearFilters}>Clear filters</button>
+                  <button className="btn glass-btn-secondary" onClick={clearFilters}>Clear filters</button>
                 )}
               </div>
             </div>
@@ -215,7 +218,7 @@ export default function FindProvidersPage() {
               {totalPages > 1 && (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 'var(--sp-3)', marginTop: 'var(--sp-10)', animation: 'fadeIn 0.4s var(--ease)' }}>
                   <button
-                    className="glass-btn-ghost"
+                    className="btn glass-btn-ghost"
                     disabled={page <= 1}
                     onClick={() => setPage(p => p - 1)}
                   >
@@ -228,7 +231,7 @@ export default function FindProvidersPage() {
                     Page {page} of {totalPages}
                   </span>
                   <button
-                    className="glass-btn-ghost"
+                    className="btn glass-btn-ghost"
                     disabled={page >= totalPages}
                     onClick={() => setPage(p => p + 1)}
                   >
