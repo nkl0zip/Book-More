@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { dashboardService } from '../../services/dashboardService'
+import { Spinner } from '../../components/ui/Spinner'
 
 /* ─── Format helpers ─────────────────────────────────────────────────────── */
 const fmtTime = (d) =>
@@ -450,15 +451,15 @@ export default function ProviderDashboard() {
                 {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
             </div>
-            <div style={{ display: 'flex', gap: 'var(--sp-3)' }}>
+            <div style={{ display: 'flex', gap: 'var(--sp-3)', alignItems: 'center' }}>
               <Link to="/provider/slots" className="btn glass-btn-primary" style={{ height: 38, fontSize: '0.875rem', padding: '0 var(--sp-4)' }}>
-                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
                   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
                 Add Slots
               </Link>
-              <button onClick={load} className="glass-btn-ghost" style={{ height: 38, fontSize: '0.875rem', width: 38, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Refresh">
-                <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={loading ? { animation: 'spin 0.8s linear infinite' } : {}}>
+              <button onClick={load} className="btn glass-btn-ghost" style={{ height: 38, width: 38, padding: 0, justifyContent: 'center' }} title="Refresh">
+                <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" viewBox="0 0 24 24" style={loading ? { animation: 'spin 0.8s linear infinite' } : {}}>
                   <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.29"/>
                 </svg>
               </button>
@@ -466,7 +467,7 @@ export default function ProviderDashboard() {
           </div>
 
           {error && (
-            <div className="glass-alert" style={{ marginBottom: 'var(--sp-5)' }}>
+            <div className="glass-alert glass-alert-error" style={{ marginBottom: 'var(--sp-5)' }}>
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
@@ -492,16 +493,14 @@ export default function ProviderDashboard() {
             <div className="content-card" style={{ gridColumn: '1 / -1', animation: 'slideInUp 0.4s var(--ease) 200ms both' }}>
               <div className="content-card-header" style={{ marginBottom: 'var(--sp-5)' }}>
                 <span className="content-card-title">This Week</span>
-                <Link to="/provider/appointments" className="glass-btn-ghost" style={{ height: 30, fontSize: '0.8125rem', padding: '0 var(--sp-3)' }}>
+                <Link to="/provider/appointments" className="btn glass-btn-ghost" style={{ height: 30, fontSize: '0.8125rem', padding: '0 var(--sp-3)' }}>
                   View all
                 </Link>
               </div>
 
               {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)', opacity: 0.4 }}>
-                  <svg className="spin" width="24" height="24" fill="none" stroke="rgba(139,92,246,0.8)" strokeWidth="2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
-                  </svg>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)' }}>
+                  <Spinner size={24} color="rgba(139,92,246,0.7)" />
                 </div>
               ) : (
                 <>
@@ -526,15 +525,13 @@ export default function ProviderDashboard() {
             <div className="content-card" style={{ animation: 'slideInUp 0.4s var(--ease) 240ms both' }}>
               <div className="content-card-header" style={{ marginBottom: 'var(--sp-4)' }}>
                 <span className="content-card-title">Upcoming Appointments</span>
-                <Link to="/provider/appointments" className="glass-btn-ghost" style={{ height: 30, fontSize: '0.8125rem', padding: '0 var(--sp-3)' }}>
+                <Link to="/provider/appointments" className="btn glass-btn-ghost" style={{ height: 30, fontSize: '0.8125rem', padding: '0 var(--sp-3)' }}>
                   All
                 </Link>
               </div>
               {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)', opacity: 0.4 }}>
-                  <svg className="spin" width="20" height="20" fill="none" stroke="rgba(139,92,246,0.8)" strokeWidth="2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
-                  </svg>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)' }}>
+                  <Spinner size={20} color="rgba(139,92,246,0.7)" />
                 </div>
               ) : (
                 <UpcomingAppts appts={data?.upcomingAppts} />
@@ -547,10 +544,8 @@ export default function ProviderDashboard() {
                 <span className="content-card-title">Recent Patients</span>
               </div>
               {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)', opacity: 0.4 }}>
-                  <svg className="spin" width="20" height="20" fill="none" stroke="rgba(139,92,246,0.8)" strokeWidth="2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
-                  </svg>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)' }}>
+                  <Spinner size={20} color="rgba(139,92,246,0.7)" />
                 </div>
               ) : (
                 <RecentPatients patients={data?.recentPatients} />
@@ -561,15 +556,13 @@ export default function ProviderDashboard() {
             <div className="content-card" style={{ animation: 'slideInUp 0.4s var(--ease) 320ms both' }}>
               <div className="content-card-header" style={{ marginBottom: 'var(--sp-4)' }}>
                 <span className="content-card-title">Services (30 days)</span>
-                <Link to="/provider/services" className="glass-btn-ghost" style={{ height: 30, fontSize: '0.8125rem', padding: '0 var(--sp-3)' }}>
+                <Link to="/provider/services" className="btn glass-btn-ghost" style={{ height: 30, fontSize: '0.8125rem', padding: '0 var(--sp-3)' }}>
                   Manage
                 </Link>
               </div>
               {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)', opacity: 0.4 }}>
-                  <svg className="spin" width="20" height="20" fill="none" stroke="rgba(139,92,246,0.8)" strokeWidth="2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
-                  </svg>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)' }}>
+                  <Spinner size={20} color="rgba(139,92,246,0.7)" />
                 </div>
               ) : (
                 <ServiceBreakdown services={data?.serviceBreakdown} />
@@ -580,15 +573,13 @@ export default function ProviderDashboard() {
             <div className="content-card" style={{ animation: 'slideInUp 0.4s var(--ease) 360ms both' }}>
               <div className="content-card-header" style={{ marginBottom: 'var(--sp-5)' }}>
                 <span className="content-card-title">Slot Utilisation (30 days)</span>
-                <Link to="/provider/slots" className="glass-btn-ghost" style={{ height: 30, fontSize: '0.8125rem', padding: '0 var(--sp-3)' }}>
+                <Link to="/provider/slots" className="btn glass-btn-ghost" style={{ height: 30, fontSize: '0.8125rem', padding: '0 var(--sp-3)' }}>
                   Manage
                 </Link>
               </div>
               {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)', opacity: 0.4 }}>
-                  <svg className="spin" width="20" height="20" fill="none" stroke="rgba(139,92,246,0.8)" strokeWidth="2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
-                  </svg>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--sp-8)' }}>
+                  <Spinner size={20} color="rgba(139,92,246,0.7)" />
                 </div>
               ) : (
                 <SlotGauge slotSummary={data?.slotSummary} />
@@ -600,31 +591,17 @@ export default function ProviderDashboard() {
               <div className="content-card-header" style={{ marginBottom: 'var(--sp-5)' }}>
                 <span className="content-card-title">Quick Actions</span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 'var(--sp-3)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 'var(--sp-3)' }}>
                 {[
-                  { to: '/provider/slots',        label: 'Add Slots',       icon: <path d="M8 6h13M8 12h9m-9 6h13M3 6h.01M3 12h.01M3 18h.01"/>, color: 'rgba(139,92,246,0.8)' },
-                  { to: '/provider/appointments', label: 'Appointments',    icon: <><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>, color: 'rgba(99,102,241,0.8)' },
-                  { to: '/provider/services',     label: 'My Services',     icon: <><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="2"/></>, color: 'rgba(20,184,166,0.8)' },
-                  { to: '/provider/profile',      label: 'Edit Profile',    icon: <><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></>, color: 'rgba(251,191,36,0.7)' },
-                  { to: '/settings/notifications',label: 'Notifications',   icon: <><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></>, color: 'rgba(244,63,94,0.7)' },
+                  { to: '/provider/slots',        label: 'Add Slots',      color: 'rgba(139,92,246,0.8)', icon: <><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></> },
+                  { to: '/provider/appointments', label: 'Appointments',   color: 'rgba(99,102,241,0.8)',  icon: <><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></> },
+                  { to: '/provider/services',     label: 'My Services',    color: 'rgba(20,184,166,0.8)',  icon: <><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></> },
+                  { to: '/provider/profile',      label: 'Edit Profile',   color: 'rgba(251,191,36,0.8)',  icon: <><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></> },
+                  { to: '/settings/notifications',label: 'Notifications',  color: 'rgba(244,63,94,0.8)',   icon: <><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></> },
                 ].map((action) => (
-                  <Link
-                    key={action.to}
-                    to={action.to}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 'var(--sp-3)',
-                      padding: 'var(--sp-4)',
-                      background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: 'var(--r-md)',
-                      color: 'var(--text-secondary)', textDecoration: 'none',
-                      fontSize: '0.875rem', fontWeight: 500,
-                      transition: 'all 0.2s var(--ease)',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)'; e.currentTarget.style.color = 'var(--text-primary)' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
-                  >
-                    <div style={{ width: 32, height: 32, borderRadius: 'var(--r-sm)', background: `${action.color}18`, border: `1px solid ${action.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: action.color, flexShrink: 0 }}>
-                      <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <Link key={action.to} to={action.to} className="quick-action">
+                    <div className="quick-action-icon" style={{ background: `${action.color.replace('0.8)', '0.12)')}`, border: `1px solid ${action.color.replace('0.8)', '0.25)')}`, color: action.color }}>
+                      <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
                         {action.icon}
                       </svg>
                     </div>

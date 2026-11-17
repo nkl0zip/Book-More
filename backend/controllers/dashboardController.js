@@ -170,7 +170,7 @@ const getDashboard = async (req, res) => {
         as: 'serviceInfo',
       },
     },
-    { $unwind: { path: '$serviceInfo', preserveNullAndEmpty: true } },
+    { $unwind: { path: '$serviceInfo', preserveNullAndEmptyArrays: true } },
     {
       $project: {
         _id: 0,

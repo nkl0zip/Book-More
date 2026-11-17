@@ -439,6 +439,21 @@ body {
   box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.20);
 }
 
+/* Select styled like form-input but with a native dropdown arrow */
+select.form-input {
+  padding-right: var(--sp-3);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(148,163,184,0.7)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+select.form-input option {
+  background: #1e1b2e;
+  color: var(--text-primary);
+}
+
 .form-error {
   display: flex;
   align-items: center;
@@ -1650,6 +1665,42 @@ a:hover { color: var(--text-link-hover); }
   .service-grid { grid-template-columns: 1fr; }
   .modal-card { padding: var(--sp-5); }
   .modal-time-row { grid-template-columns: 1fr !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD QUICK ACTIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+.quick-action {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--r-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease), transform 0.15s var(--ease);
+}
+
+.quick-action:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.quick-action-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════
