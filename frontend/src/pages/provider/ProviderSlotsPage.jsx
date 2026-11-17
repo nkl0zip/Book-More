@@ -138,23 +138,21 @@ function SlotFormModal({ slot, defaultDate, services, onClose, onSaved }) {
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal-card">
+
         <div className="modal-header">
           <span className="modal-title">{isEditing ? 'Edit Slot' : 'Add Availability Slot'}</span>
-          <button className="modal-close" onClick={onClose}><IconClose /></button>
+          <button className="modal-close" onClick={onClose} aria-label="Close"><IconClose /></button>
         </div>
 
-        {serverError && (
-          <div className="glass-alert" role="alert" style={{ marginBottom: 'var(--sp-5)' }}>
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-            {serverError}
-          </div>
-        )}
-
         {isEditing && slot.isBooked && (
-          <div className="success-banner" style={{ background: 'rgba(120,53,15,0.35)', borderColor: 'rgba(251,191,36,0.25)', borderLeftColor: '#d97706', color: 'rgba(253,230,138,1)', marginBottom: 'var(--sp-5)' }}>
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 'var(--sp-3)',
+            padding: 'var(--sp-3) var(--sp-4)', marginBottom: 'var(--sp-5)',
+            background: 'rgba(120,53,15,0.25)', borderRadius: 'var(--r-md)',
+            border: '1px solid rgba(251,191,36,0.18)', borderLeft: '3px solid #d97706',
+            fontSize: '0.875rem', color: 'rgba(253,230,138,0.9)',
+          }}>
+            <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ flexShrink: 0 }}>
               <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
               <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
@@ -162,95 +160,88 @@ function SlotFormModal({ slot, defaultDate, services, onClose, onSaved }) {
           </div>
         )}
 
+        {serverError && (
+          <div className="glass-alert glass-alert-error" role="alert" style={{ marginBottom: 'var(--sp-5)' }}>
+            <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: 1 }}>
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {serverError}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="stagger-form">
-            <div className="form-row">
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label" htmlFor="sl-start">Start Time</label>
-                <input
-                  id="sl-start"
-                  type="datetime-local"
-                  className={`form-input${errors.startTime ? ' error' : ''}`}
-                  disabled={isEditing && slot.isBooked}
-                  {...register('startTime', {
-                    required: 'Start time is required',
-                    validate: v => {
-                      if (isEditing && slot.isBooked) return true
-                      return new Date(v) > new Date() || 'Start time must be in the future'
-                    },
-                  })}
-                />
-                {errors.startTime && <p className="form-error">{errors.startTime.message}</p>}
-              </div>
 
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label" htmlFor="sl-end">End Time</label>
-                <input
-                  id="sl-end"
-                  type="datetime-local"
-                  className={`form-input${errors.endTime ? ' error' : ''}`}
-                  disabled={isEditing && slot.isBooked}
-                  {...register('endTime', {
-                    required: 'End time is required',
-                    validate: v => !startVal || new Date(v) > new Date(startVal) || 'End time must be after start time',
-                  })}
-                />
-                {errors.endTime && <p className="form-error">{errors.endTime.message}</p>}
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="sl-service">
-                Service
-                <span style={{ color: 'var(--text-tertiary)', fontWeight: 400, marginLeft: 'var(--sp-2)' }}>(optional)</span>
-              </label>
-              <select
-                id="sl-service"
-                {...register('service')}
-                style={{
-                  width: '100%', height: 46,
-                  background: 'var(--glass-bg-input)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: 'var(--r-md)',
-                  color: 'var(--text-primary)',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.9375rem',
-                  padding: '0 var(--sp-4)',
-                  outline: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <option value="" style={{ background: '#1a1a2e' }}>— No specific service —</option>
-                {services.map(s => (
-                  <option key={s._id} value={s._id} style={{ background: '#1a1a2e' }}>
-                    {s.name} ({s.durationMinutes} min)
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="sl-notes">
-                Notes
-                <span style={{ color: 'var(--text-tertiary)', fontWeight: 400, marginLeft: 'var(--sp-2)' }}>(optional)</span>
-              </label>
-              <textarea
-                id="sl-notes"
-                className={`form-textarea${errors.notes ? ' error' : ''}`}
-                placeholder="Any notes for this slot…"
-                rows={2}
-                {...register('notes', { maxLength: { value: 300, message: 'Max 300 characters' } })}
+          {/* Time row */}
+          <div className="modal-time-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)', marginBottom: 'var(--sp-4)' }}>
+            <div style={{ minWidth: 0 }}>
+              <label className="form-label" htmlFor="sl-start" style={{ display: 'block', marginBottom: 'var(--sp-2)' }}>Start Time</label>
+              <input
+                id="sl-start"
+                type="datetime-local"
+                className={`form-input${errors.startTime ? ' error' : ''}`}
+                style={{ width: '100%', minWidth: 0 }}
+                disabled={isEditing && slot.isBooked}
+                {...register('startTime', {
+                  required: 'Start time is required',
+                  validate: v => {
+                    if (isEditing && slot.isBooked) return true
+                    return new Date(v) > new Date() || 'Must be in the future'
+                  },
+                })}
               />
-              {errors.notes && <p className="form-error">{errors.notes.message}</p>}
+              {errors.startTime && <p className="form-error" style={{ marginTop: 'var(--sp-1)' }}>{errors.startTime.message}</p>}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <label className="form-label" htmlFor="sl-end" style={{ display: 'block', marginBottom: 'var(--sp-2)' }}>End Time</label>
+              <input
+                id="sl-end"
+                type="datetime-local"
+                className={`form-input${errors.endTime ? ' error' : ''}`}
+                style={{ width: '100%', minWidth: 0 }}
+                disabled={isEditing && slot.isBooked}
+                {...register('endTime', {
+                  required: 'End time is required',
+                  validate: v => !startVal || new Date(v) > new Date(startVal) || 'Must be after start',
+                })}
+              />
+              {errors.endTime && <p className="form-error" style={{ marginTop: 'var(--sp-1)' }}>{errors.endTime.message}</p>}
             </div>
           </div>
 
+          {/* Service */}
+          <div style={{ marginBottom: 'var(--sp-4)' }}>
+            <label className="form-label" htmlFor="sl-service" style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', marginBottom: 'var(--sp-2)' }}>
+              Service <span style={{ color: 'var(--text-tertiary)', fontWeight: 400, fontSize: '0.8125rem' }}>optional</span>
+            </label>
+            <select id="sl-service" className="form-input" {...register('service')}>
+              <option value="">— No specific service —</option>
+              {services.map(s => (
+                <option key={s._id} value={s._id}>{s.name} ({s.durationMinutes} min)</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Notes */}
+          <div style={{ marginBottom: 'var(--sp-2)' }}>
+            <label className="form-label" htmlFor="sl-notes" style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', marginBottom: 'var(--sp-2)' }}>
+              Notes <span style={{ color: 'var(--text-tertiary)', fontWeight: 400, fontSize: '0.8125rem' }}>optional</span>
+            </label>
+            <textarea
+              id="sl-notes"
+              className={`form-textarea${errors.notes ? ' error' : ''}`}
+              placeholder="Any notes for this slot…"
+              rows={3}
+              {...register('notes', { maxLength: { value: 300, message: 'Max 300 characters' } })}
+            />
+            {errors.notes && <p className="form-error" style={{ marginTop: 'var(--sp-1)' }}>{errors.notes.message}</p>}
+          </div>
+
           <div className="modal-footer">
-            <button type="button" className="glass-btn-ghost" onClick={onClose}>Cancel</button>
-            <button type="submit" className="glass-btn-primary" disabled={isSubmitting}>
+            <button type="button" className="btn glass-btn-ghost" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn glass-btn-primary" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
-                  <svg className="spin" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <svg className="spin" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" strokeOpacity="0.25"/>
                     <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
                   </svg>
@@ -259,6 +250,7 @@ function SlotFormModal({ slot, defaultDate, services, onClose, onSaved }) {
               ) : isEditing ? 'Save Changes' : 'Create Slot'}
             </button>
           </div>
+
         </form>
       </div>
     </div>
@@ -307,7 +299,7 @@ function WeekCalendar({ slots, weekStart, onDayClick, onSlotClick }) {
                   onClick={e => { e.stopPropagation(); onSlotClick(s) }}
                   title={`${fmtTime(s.startTime)} – ${fmtTime(s.endTime)}${s.service ? ' · ' + s.service.name : ''}`}
                 >
-                  <span className="slot-chip-time">{fmtTime(s.startTime)}</span>
+                  <span className="slot-chip-time">{fmtTime(s.startTime)} – {fmtTime(s.endTime)}</span>
                   {s.service && <span className="slot-chip-label">{s.service.name}</span>}
                   {s.isBooked && <span className="slot-chip-booked">Booked</span>}
                 </button>
@@ -500,7 +492,7 @@ export default function ProviderSlotsPage() {
                 </p>
               </div>
               <button
-                className="glass-btn-primary"
+                className="btn glass-btn-primary"
                 style={{ flexShrink: 0, marginTop: 'var(--sp-1)' }}
                 onClick={() => setFormModal({ defaultDate: new Date() })}
               >
@@ -511,38 +503,39 @@ export default function ProviderSlotsPage() {
           </div>
 
           {/* Week nav + view toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-4)', marginBottom: 'var(--sp-6)', flexWrap: 'wrap', animation: 'slideInUp 0.4s var(--ease) 80ms both' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)', marginBottom: 'var(--sp-6)', flexWrap: 'wrap', animation: 'slideInUp 0.4s var(--ease) 80ms both' }}>
+
+            {/* Arrow / date / today — unified pill group */}
+            <div className="week-nav-group">
               <button
-                className="glass-btn-ghost"
-                style={{ height: 36, paddingInline: 'var(--sp-3)' }}
+                className="week-nav-btn"
                 onClick={() => setWeekStart(d => addDays(d, -7))}
                 title="Previous week"
+                aria-label="Previous week"
               ><IconChevLeft /></button>
 
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9375rem', minWidth: 180, textAlign: 'center' }}>
-                {weekLabel}
-              </span>
+              <span className="week-nav-label">{weekLabel}</span>
 
               <button
-                className="glass-btn-ghost"
-                style={{ height: 36, paddingInline: 'var(--sp-3)' }}
+                className="week-nav-btn"
                 onClick={() => setWeekStart(d => addDays(d, 7))}
                 title="Next week"
+                aria-label="Next week"
               ><IconChevRight /></button>
 
+              <span className="week-nav-divider" />
+
               <button
-                className="glass-btn-ghost"
-                style={{ height: 36, fontSize: '0.8125rem', marginLeft: 'var(--sp-2)' }}
+                className="week-nav-today"
                 onClick={() => setWeekStart(startOfWeek(new Date()))}
               >Today</button>
             </div>
 
             <div className="glass-tabs" style={{ marginBottom: 0, marginLeft: 'auto' }}>
-              <button className={`glass-tab${view === 'calendar' ? ' active' : ''}`} onClick={() => setView('calendar')} style={{ gap: 'var(--sp-2)' }}>
+              <button className={`glass-tab${view === 'calendar' ? ' active' : ''}`} onClick={() => setView('calendar')}>
                 <IconGrid /> Week
               </button>
-              <button className={`glass-tab${view === 'list' ? ' active' : ''}`} onClick={() => setView('list')} style={{ gap: 'var(--sp-2)' }}>
+              <button className={`glass-tab${view === 'list' ? ' active' : ''}`} onClick={() => setView('list')}>
                 <IconList /> List
               </button>
             </div>
@@ -641,9 +634,9 @@ export default function ProviderSlotsPage() {
               This cannot be undone.
             </p>
             <div className="modal-footer">
-              <button className="glass-btn-ghost" onClick={() => setDeleteTarget(null)}>Cancel</button>
+              <button className="btn glass-btn-ghost" onClick={() => setDeleteTarget(null)}>Cancel</button>
               <button
-                className="glass-btn-primary"
+                className="btn glass-btn-primary"
                 style={{ background: 'linear-gradient(135deg,#dc2626,#b91c1c)', boxShadow: '0 4px 14px rgba(220,38,38,0.35)' }}
                 onClick={handleDelete}
                 disabled={deleting}

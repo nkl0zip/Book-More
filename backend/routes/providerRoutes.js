@@ -11,13 +11,13 @@ const { validate, schemas } = require('../middleware/validateMiddleware')
 
 const router = express.Router()
 
+// Static paths before parameterised /:id
+router.get('/me/profile',    protect, authorise('provider'), getMyProfile)
+router.patch('/me/profile',  protect, authorise('provider'), validate(schemas.updateProviderProfile), updateMyProfile)
+router.patch('/me/deactivate', protect, authorise('provider'), deactivateAccount)
+
 // Public routes
 router.get('/', getAllProviders)
 router.get('/:id', getProviderById)
-
-// Provider-only routes
-router.get('/me/profile', protect, authorise('provider'), getMyProfile)
-router.patch('/me/profile', protect, authorise('provider'), validate(schemas.updateProviderProfile), updateMyProfile)
-router.patch('/me/deactivate', protect, authorise('provider'), deactivateAccount)
 
 module.exports = router

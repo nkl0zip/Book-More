@@ -111,7 +111,6 @@ export default function RegisterPage() {
 
   const [serverError, setServerError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [selectedRole, setSelectedRole] = useState('patient') // eslint-disable-line no-unused-vars
 
   const {
     register,
@@ -175,7 +174,6 @@ export default function RegisterPage() {
                     type="radio"
                     value="patient"
                     {...register('role')}
-                    onChange={(e) => setSelectedRole(e.target.value)}
                   />
                   <div className="role-card">
                     <div className="role-card-icon"><IconHeartPulse /></div>
@@ -189,7 +187,6 @@ export default function RegisterPage() {
                     type="radio"
                     value="provider"
                     {...register('role')}
-                    onChange={(e) => setSelectedRole(e.target.value)}
                   />
                   <div className="role-card">
                     <div className="role-card-icon"><IconStethoscope /></div>

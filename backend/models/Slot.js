@@ -40,23 +40,21 @@ const slotSchema = new mongoose.Schema(
 slotSchema.index({ provider: 1, startTime: 1, endTime: 1 })
 
 // Pre-save: endTime > startTime
-slotSchema.pre('save', function (next) {
+slotSchema.pre('save', function () {
   if (this.endTime <= this.startTime) {
     const err = new Error('End time must be after start time')
     err.statusCode = 400
-    return next(err)
+    throw err
   }
-  next()
 })
 
 // Pre-save: startTime must be in the future (only on new slots, not updates to isBooked etc.)
-slotSchema.pre('save', function (next) {
+slotSchema.pre('save', function () {
   if (this.isNew && this.startTime <= new Date()) {
     const err = new Error('Slot start time must be in the future')
     err.statusCode = 400
-    return next(err)
+    throw err
   }
-  next()
 })
 
 module.exports = mongoose.model('Slot', slotSchema)

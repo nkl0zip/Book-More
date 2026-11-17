@@ -451,8 +451,8 @@ export default function ProviderDashboard() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: 'var(--sp-3)' }}>
-              <Link to="/provider/slots" className="glass-btn-primary" style={{ height: 38, fontSize: '0.875rem' }}>
-                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ marginRight: 'var(--sp-2)' }}>
+              <Link to="/provider/slots" className="btn glass-btn-primary" style={{ height: 38, fontSize: '0.875rem', padding: '0 var(--sp-4)' }}>
+                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
                 Add Slots
