@@ -2316,6 +2316,7 @@ a:hover { color: var(--text-link-hover); }
   .appt-actions { flex-wrap: wrap; }
 }
 
+
 /* ── History Chain Timeline ────────────────────────────────────── */
 .history-chain {
   display: flex;
